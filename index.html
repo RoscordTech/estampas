@@ -154,6 +154,20 @@
             max-height: 500px; /* Suficiente altura para el contenido */
             opacity: 1;
         }
+        
+        /* Estilos para la guía de talles (Inicialmente oculta y animada) */
+        #sizeGuideTable {
+            transition: max-height 0.5s ease-in-out, opacity 0.3s ease-in-out, padding 0.5s ease-in-out;
+            max-height: 0;
+            opacity: 0;
+            padding: 0 1rem;
+            overflow: hidden;
+        }
+        #sizeGuideTable.active {
+            max-height: 500px; /* Suficiente altura */
+            opacity: 1;
+            padding: 1rem; /* Padding original */
+        }
     </style>
 </head>
 
@@ -306,16 +320,17 @@
                     
                     <!-- BOTÓN DE WHATSAPP con el icono de usuario y ANIMACIÓN PULSADA -->
                     <a href="https://wa.me/5491100000000?text=Hola,%20me%20interesa%20una%20cotización%20de%20sublimación." target="_blank" class="whatsapp-button inline-flex items-center justify-center mt-6 mb-10 bg-green-500 text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 transform hover:scale-105 shadow-xl hover:bg-green-600">
-                        <img src="whatsapp_icon.png" alt="Icono de WhatsApp" class="w-6 h-6 mr-3">
+                        <!-- IMAGEN DE WHATSAPP (Archivo Propio) -->
+                        <img src="whatsapp-icon.png" alt="Icono de WhatsApp" class="w-6 h-6 mr-3">
                         Contactar Directo por WhatsApp
                     </a>
                 </div>
 
                 <div class="bg-white p-8 md:p-10 rounded-2xl shadow-2xl">
-                    <!-- FORMULARIO REAL CONECTADO A FORMSUBMIT -->
+                    <!-- FORMULARIO CON EL CORREO ACTUALIZADO -->
                     <form id="contactForm" action="https://formsubmit.co/ellsanty123@gmail.com" method="POST" class="space-y-6" onsubmit="return submitFormWithDesign(event)">
                         
-                        <!-- Campo oculto para definir el asunto del email (Cambiado a SYMF Print) -->
+                        <!-- Campo oculto para definir el asunto del email -->
                         <input type="hidden" name="_subject" value="Nueva Solicitud de Cotización (SYMF Print)">
                         
                         <!-- CAMPO OCULTO PARA LA IMAGEN DEL DISEÑO (Base64) -->
@@ -353,6 +368,17 @@
         </section>
     </main>
 
+    <!-- FOOTER -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-sm text-gray-400">&copy; 2024 SYMF Print. Todos los derechos reservados.</p>
+            <div class="mt-2 text-sm">
+                <a href="#contacto" class="text-primary hover:text-secondary transition duration-300">Contáctanos</a> | 
+                <span class="text-gray-500">Diseñado con ❤️ en Tarragona</span>
+            </div>
+        </div>
+    </footer>
+
     <!-- MODAL DEL PERSONALIZADOR (Fuera de <main> y oculto) -->
     <div id="customizerModal" class="fixed inset-0 z-[100] bg-dark-bg/95 backdrop-blur-sm hidden overflow-y-auto transition-opacity duration-300 opacity-0">
         <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
@@ -380,6 +406,7 @@
                                     src="camiseta_blanca.jpg" 
                                     alt="Camiseta Blanca Personalizada" 
                                     class="product-base-inner w-full h-full object-cover transition-opacity duration-300"
+                                    onerror="this.style.opacity = '0'; document.getElementById('baseColorPlaceholder').classList.remove('hidden'); document.getElementById('productMockupIcon').setAttribute('data-product', 'Camiseta'); updateProductBaseColor('Blanca');"
                                 >
                                 
                                 <!-- Placeholder de Color (Solo visible si no hay imagen de mockup o si falla la carga) -->
@@ -387,8 +414,8 @@
                                     <div class="product-base-inner">
                                         <!-- Icono Lucide para un mockup genérico -->
                                         <svg xmlns="http://www.w3.org/2000/svg" id="productMockupIcon" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shirt mb-2 text-gray-400"><path d="M20.3 3.3a2 2 0 0 0-2.6.4l-4.2 3.8L9 3.7c-.5-.4-1-.7-1.7-.7s-1.2.3-1.7.7L2.3 8.2a2 2 0 0 0-.4 2.6l4.2 3.8V21a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6.4l4.2-3.8a2 2 0 0 0-.4-2.6z"/></svg>
-                                        <p class="text-xl font-bold"></p>
-                                        <p class="text-sm">(Mockup Color)</p>
+                                        <p class="text-xl font-bold" id="placeholderText">Camiseta Blanca</p>
+                                        <p class="text-sm">(Mockup de Color Genérico)</p>
                                     </div>
                                 </div>
                                 
@@ -459,7 +486,7 @@
                             </ul>
                         </div>
                         
-                        <!-- 4. Talle (Condicional) -->
+                        <!-- 3. Talle (Condicional) -->
                         <div id="shirtSizeSelector" class="transition-all duration-300 ease-in-out overflow-hidden mt-8 max-h-[500px]">
                             <h3 class="text-2xl font-semibold mb-4 text-gray-900">3. Selecciona Talle</h3>
                             <div class="space-y-4">
@@ -471,649 +498,438 @@
                                     <option value="Talle XL">XL - Extra Large</option>
                                 </select>
                                 
-                                <button onclick="toggleSizeGuide()" class="text-sm font-medium text-primary hover:text-sky-600 transition duration-300 flex items-center mt-2 hover:scale-105">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ruler mr-1"><path d="M20 7H4"/><path d="M10 3v4"/><path d="M14 3v4"/><path d="M16 11H8"/><path d="M12 7v14"/></svg>
-                                    <span id="guideToggleButton">Ver Guía de Talles (Cerrar)</span>
+                                <button onclick="toggleSizeGuide()" class="text-sm font-medium text-primary hover:text-sky-600 transition duration-300 mt-2 hover:underline">
+                                    <span id="sizeGuideToggleText">Mostrar Guía de Talles</span>
                                 </button>
-                            </div>
-                            
-                            <div id="sizeGuideTable" class="mt-6 p-0 border border-gray-300 rounded-lg bg-gray-50 overflow-hidden transition-all duration-300 ease-in-out max-h-fit">
-                                <div class="p-4">
-                                    <h4 class="text-lg font-bold mb-3 text-gray-800">Guía de Talles (Medidas en cm)</h4>
-                                    <table class="w-full text-sm text-gray-700 text-left">
-                                        <thead class="border-b border-gray-200">
+                                
+                                <!-- Guía de Talles Desplegable (Inicialmente oculta con la clase 'hidden') -->
+                                <div id="sizeGuideTable" class="bg-gray-100 rounded-lg mt-3">
+                                    <table class="w-full text-sm text-left text-gray-600">
+                                        <thead class="text-xs text-gray-700 uppercase bg-gray-200 rounded-t-lg">
                                             <tr>
-                                                <th class="py-1 pr-2">Talle</th>
-                                                <th class="py-1 px-2">Ancho (Pecho)</th>
-                                                <th class="py-1 pl-2">Largo (Espalda)</th>
+                                                <th scope="col" class="py-2 px-4">Talle</th>
+                                                <th scope="col" class="py-2 px-4">Ancho (cm)</th>
+                                                <th scope="col" class="py-2 px-4">Largo (cm)</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr class="border-b border-gray-100">
-                                                <td class="py-1 pr-2 font-semibold">S</td>
-                                                <td class="py-1 px-2">48 cm</td>
-                                                <td class="py-1 pl-2">68 cm</td>
+                                            <tr class="bg-white border-b">
+                                                <th scope="row" class="py-2 px-4 font-medium text-gray-900">S</th>
+                                                <td class="py-2 px-4">48</td>
+                                                <td class="py-2 px-4">68</td>
                                             </tr>
-                                            <tr class="border-b border-gray-100">
-                                                <td class="py-1 px-2 font-semibold">M</td>
-                                                <td class="py-1 pl-2">51 cm</td>
-                                                <td class="py-1 pl-2">71 cm</td>
+                                            <tr class="bg-gray-50 border-b">
+                                                <th scope="row" class="py-2 px-4 font-medium text-gray-900">M</th>
+                                                <td class="py-2 px-4">52</td>
+                                                <td class="py-2 px-4">70</td>
                                             </tr>
-                                            <tr class="border-b border-gray-100">
-                                                <td class="py-1 pr-2 font-semibold">L</td>
-                                                <td class="py-1 px-2">54 cm</td>
-                                                <td class="py-1 pl-2">74 cm</td>
+                                            <tr class="bg-white">
+                                                <th scope="row" class="py-2 px-4 font-medium text-gray-900">L</th>
+                                                <td class="py-2 px-4">56</td>
+                                                <td class="py-2 px-4">72</td>
                                             </tr>
-                                            <tr>
-                                                <td class="py-1 pr-2 font-semibold">XL</td>
-                                                <td class="py-1 px-2">57 cm</td>
-                                                <td class="py-1 pl-2">77 cm</td>
+                                            <tr class="bg-gray-50">
+                                                <th scope="row" class="py-2 px-4 font-medium text-gray-900">XL</th>
+                                                <td class="py-2 px-4">60</td>
+                                                <td class="py-2 px-4">74</td>
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <p class="text-xs mt-3 text-gray-500">Nota: El ancho se mide de axila a axila. Tolerancia de $\pm 2$ cm.</p>
                                 </div>
                             </div>
                         </div>
 
-                        <button onclick="resetDesign()" class="mt-8 w-full bg-red-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-red-600 transition duration-300 shadow-md hover:scale-[1.01]">
-                            Reiniciar Diseño
-                        </button>
+                        <!-- Botón Final de Contacto desde el Personalizador -->
+                        <a href="#contacto" onclick="closeCustomizerAndPrefill(event)" class="mt-8 w-full inline-flex items-center justify-center bg-secondary text-dark-bg font-bold py-3 px-4 rounded-lg hover:bg-yellow-300 transition duration-300 shadow-xl transform hover:scale-[1.01]">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send-horizontal mr-2"><polyline points="21 12 17 8 17 16"/><line x1="3" x2="17" y1="12" y2="12"/></svg>
+                            Enviar Diseño y Solicitar Cotización
+                        </a>
                     </div>
-                </div>
-                
-                <!-- Call to action después del diseño -->
-                <div class="mt-12 text-center">
-                    <a href="#contacto" onclick="closeCustomizer()" class="inline-block bg-primary text-white font-bold py-3 px-10 rounded-full text-lg hover:bg-sky-600 transition duration-300 transform hover:scale-105 shadow-xl animate-pulse-shadow">
-                        ¡Me gusta! Quiero Cotizar este Diseño
-                    </a>
                 </div>
             </div>
         </div>
     </div>
+    
+    <!-- CARGA DE GOOGLE MAPS (LA CLAVE YA ESTÁ INCLUIDA) -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCILSQvZqz9G1XqFnDX54esJDmoedAC1YM&callback=initMap"></script>
 
-    <!-- Modal de Confirmación Global (Añadido para mensajes de éxito/error del formulario) -->
-    <div id="statusModal" class="fixed inset-0 z-[110] bg-dark-bg/80 backdrop-blur-sm hidden flex items-center justify-center transition-opacity duration-300 opacity-0">
-        <div id="modalContent" class="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center transform scale-90 transition duration-300">
-            <h3 id="modalTitle" class="text-2xl font-bold mb-3"></h3>
-            <p id="modalMessage" class="text-gray-600 mb-6"></p>
-            <button onclick="closeCustomModal()" class="bg-primary text-white font-semibold py-2 px-6 rounded-full hover:bg-sky-600 transition duration-300">
-                Aceptar
-            </button>
-        </div>
-    </div>
-
-    <!-- Script de Inicialización del Mapa de Google Maps -->
+    <!-- LÓGICA DE JAVASCRIPT CORREGIDA Y COMPLETA -->
     <script>
-        // *** IMPORTANTE: TU CLAVE DE API DE GOOGLE MAPS INSERTADA AQUÍ ***
-        const googleMapsApiKey = "AIzaSyCILSQvZqz9G1XqFnDX54esJDmoedAC1YM";
+        // --- 1. CONFIGURACIÓN INICIAL DEL PERSONALIZADOR ---
+        let scale = 1.0;
+        let positionX = 0;
+        let positionY = 0;
+        let isDragging = false;
+        let startX, startY;
+        let activeProduct = 'Camiseta';
+        let activeColor = 'Blanca';
         
-        const TARRAGONA_COORDS = { lat: 41.1166, lng: 1.2500 }; 
-        const MAP_ZOOM = 14;
+        const overlay = document.getElementById('designOverlay');
+        const container = document.getElementById('previewBox');
+        const baseProductImage = document.getElementById('baseProductImage');
+        const baseColorPlaceholder = document.getElementById('baseColorPlaceholder');
+        const placeholderText = document.getElementById('placeholderText');
+        const productBaseContainer = document.getElementById('productBaseContainer');
 
-        // Función que Google Maps llama al cargarse
-        function initMap() {
-            const mapElement = document.getElementById('contactMap');
-            const mapLoader = document.getElementById('mapLoader');
-            
-            if (mapLoader) {
-                 mapLoader.remove(); // Eliminar el loader si el mapa se carga
-            }
-            
-            const map = new google.maps.Map(mapElement, {
-                center: TARRAGONA_COORDS,
-                zoom: MAP_ZOOM,
-                disableDefaultUI: false, // Puedes dejar los controles por defecto
-                mapId: 'DEMO_MAP_ID' 
-            });
-
-            new google.maps.Marker({
-                position: TARRAGONA_COORDS,
-                map: map,
-                title: 'SYMF Print - Ubicación en Tarragona',
-            });
-            
-            console.log('Mapa de Google Maps inicializado en Tarragona.');
-        }
-
-        // Esta función se llama si falla la carga o autenticación del API de Google Maps
-        window.gm_authFailure = function() {
-            console.error("Error de autenticación de Google Maps. Asegúrate de que la clave API sea válida.");
-            const mapContainer = document.getElementById('contactMap');
-            mapContainer.innerHTML = `
-                <div class="w-full h-full flex flex-col items-center justify-center bg-red-100/70 text-red-700 p-8 text-center rounded-xl">
-                    <svg class="w-10 h-10 text-red-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                    <p class="font-bold text-lg mb-2">Mapa No Disponible</p>
-                    <p class="text-sm">La clave de API de Google Maps no está configurada o es inválida. Edita el código para insertarla.</p>
-                </div>
-            `;
+        const mockupUrls = {
+            'Camiseta-Blanca': 'camiseta_blanca.jpg',
+            // El resto usa el placeholder de color ya que las URLs reales faltan
+            'Camiseta-Negra': 'camiseta_negra.jpg', 
+            'Taza-Blanca': 'taza_blanca.jpg',
+            'Taza-Negra': 'taza_negra.jpg',
         };
 
-        // Lógica para cargar el script de Google Maps
-        function loadGoogleMapsScript() {
-            const mapElement = document.getElementById('contactMap');
-            mapElement.style.height = '400px'; 
+        // Función auxiliar para actualizar el estilo CSS del overlay
+        function applyTransform() {
+            overlay.style.transform = `translate(-50%, -50%) translate(${positionX}px, ${positionY}px) scale(${scale})`;
+        }
+
+        // --- 2. LÓGICA DE MANEJO DE DISEÑO (Arrastrar, Zoom, Subida) ---
+
+        // Configuración de Eventos de Interacción (Mouse y Touch)
+        function setupInteractionListeners() {
+            // DRAG (Mouse Down/Touch Start)
+            container.addEventListener('mousedown', startDrag);
+            container.addEventListener('touchstart', startDrag);
             
-            if (!googleMapsApiKey || googleMapsApiKey === "TU_CLAVE_API_AQUI") {
-                 window.gm_authFailure();
-                 return;
+            // ZOOM (Mouse Wheel)
+            container.addEventListener('wheel', handleZoom);
+        }
+
+        function startDrag(e) {
+            if (overlay.classList.contains('opacity-0')) return; // No arrastrar si no hay diseño
+            e.preventDefault(); 
+            isDragging = true;
+            
+            // Obtener coordenadas de inicio (maneja mouse o el primer toque)
+            if (e.type === 'touchstart' && e.touches.length === 1) {
+                startX = e.touches[0].clientX - positionX;
+                startY = e.touches[0].clientY - positionY;
+                overlay.style.cursor = 'grabbing';
+                
+                // Añadir listeners de movimiento y fin para móvil
+                document.addEventListener('touchmove', handleDrag);
+                document.addEventListener('touchend', endDrag);
+                
+            } else if (e.type === 'mousedown') {
+                startX = e.clientX - positionX;
+                startY = e.clientY - positionY;
+                overlay.style.cursor = 'grabbing';
+                
+                // Añadir listeners de movimiento y fin para desktop
+                document.addEventListener('mousemove', handleDrag);
+                document.addEventListener('mouseup', endDrag);
             }
+        }
+
+        function handleDrag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+
+            let currentX, currentY;
+            if (e.type === 'touchmove' && e.touches.length === 1) {
+                currentX = e.touches[0].clientX;
+                currentY = e.touches[0].clientY;
+            } else if (e.type === 'mousemove') {
+                currentX = e.clientX;
+                currentY = e.clientY;
+            } else {
+                return; // Ignorar toques múltiples (manejo de zoom/pinch)
+            }
+
+            // Calcular nuevas posiciones
+            positionX = currentX - startX;
+            positionY = currentY - startY;
+
+            applyTransform();
+        }
+
+        function endDrag(e) {
+            isDragging = false;
+            overlay.style.cursor = 'grab';
             
-            const script = document.createElement('script');
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&callback=initMap`;
-            script.async = true;
-            script.defer = true;
-            document.head.appendChild(script);
+            // Limpiar listeners
+            document.removeEventListener('mousemove', handleDrag);
+            document.removeEventListener('mouseup', endDrag);
+            document.removeEventListener('touchmove', handleDrag);
+            document.removeEventListener('touchend', endDrag);
+        }
+
+        function handleZoom(e) {
+            e.preventDefault();
+            const delta = e.deltaY * -0.001; // Invertir y suavizar la rueda
+            scale = Math.max(0.2, Math.min(3.0, scale + delta)); // Limitar escala entre 0.2 y 3.0
+            applyTransform();
         }
         
-        // --- LÓGICA DEL MENÚ MÓVIL ---
+        // Inicializar los listeners al cargar la página
+        window.onload = setupInteractionListeners;
+
+        // Manejo de la subida de archivos
+        document.getElementById('designUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    overlay.src = event.target.result;
+                    overlay.classList.remove('opacity-0');
+                    document.getElementById('designPrompt').classList.add('hidden');
+                    document.getElementById('interactionGuide').classList.remove('hidden');
+                    
+                    // Resetear posición y escala
+                    scale = 1.0;
+                    positionX = 0;
+                    positionY = 0;
+                    applyTransform();
+                };
+                reader.readAsDataURL(file);
+                document.getElementById('uploadStatus').textContent = `Archivo cargado: ${file.name}`;
+                document.getElementById('uploadStatus').classList.remove('hidden');
+            }
+        });
+
+
+        // --- 3. LÓGICA DEL VISTAZO DE PRODUCTO Y COLOR ---
+        
+        function updateProductBaseColor(color) {
+            const product = activeProduct;
+            const element = baseColorPlaceholder.querySelector('.product-base-inner');
+            const icon = document.getElementById('productMockupIcon');
+            
+            // Reiniciar clases de color
+            element.className = 'product-base-inner';
+            
+            // Asignar fondo y texto según producto/color
+            if (product === 'Camiseta') {
+                icon.innerHTML = '<path d="M20.3 3.3a2 2 0 0 0-2.6.4l-4.2 3.8L9 3.7c-.5-.4-1-.7-1.7-.7s-1.2.3-1.7.7L2.3 8.2a2 2 0 0 0-.4 2.6l4.2 3.8V21a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6.4l4.2-3.8a2 2 0 0 0-.4-2.6z"/>';
+                placeholderText.textContent = `Camiseta ${color}`;
+                if (color === 'Blanca') {
+                    element.classList.add('bg-white', 'text-gray-900');
+                } else { // Negra
+                    element.classList.add('bg-gray-800', 'text-gray-200');
+                }
+            } else { // Taza
+                 icon.innerHTML = '<rect width="18" height="10" x="3" y="2" rx="3"/><path d="M7 2h10c1.7 0 3 1.3 3 3v5c0 1.7-1.3 3-3 3h-2v3a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-3H7c-1.7 0-3-1.3-3-3V5c0-1.7 1.3-3 3-3z"/>'; // Icono de Taza Lucide (Mockup genérico)
+                placeholderText.textContent = `Taza ${color}`;
+                if (color === 'Blanca') {
+                    element.classList.add('bg-white', 'text-gray-900');
+                } else { // Negra
+                    element.classList.add('bg-gray-900', 'text-gray-200');
+                }
+            }
+        }
+
+        function updateProductView() {
+            activeProduct = document.querySelector('input[name="productType"]:checked').value;
+            activeColor = document.querySelector('input[name="productColor"]:checked').value;
+            
+            const productKey = `${activeProduct}-${activeColor}`;
+            
+            // 1. Actualizar clase de aspecto
+            productBaseContainer.classList.remove('aspect-ratio-portrait', 'aspect-ratio-square');
+            if (activeProduct === 'Camiseta') {
+                productBaseContainer.classList.add('aspect-ratio-portrait');
+                document.getElementById('shirtSizeSelector').classList.remove('hidden');
+            } else { // Taza
+                productBaseContainer.classList.add('aspect-ratio-square');
+                document.getElementById('shirtSizeSelector').classList.add('hidden');
+            }
+
+            // 2. Actualizar imagen de mockup o placeholder
+            if (mockupUrls[productKey]) {
+                baseProductImage.src = mockupUrls[productKey];
+                // Intentar cargar la imagen, el onerror manejará el fallback al placeholder
+                baseProductImage.style.opacity = '1';
+                baseColorPlaceholder.classList.add('hidden');
+                
+            } else {
+                // Forzar el uso del placeholder si la URL no está en la lista de mockups
+                baseProductImage.style.opacity = '0';
+                baseColorPlaceholder.classList.remove('hidden');
+                updateProductBaseColor(activeColor); // Llama al handler del placeholder
+            }
+        }
+
+        // --- 4. CONTROL DEL MODAL ---
+
+        function openCustomizer(e) {
+            e.preventDefault();
+            document.getElementById('customizerModal').classList.remove('hidden');
+            // Timeout para asegurar que la transición de opacidad se aplique correctamente
+            setTimeout(() => {
+                document.getElementById('customizerModal').classList.add('opacity-100');
+            }, 10);
+            updateProductView(); // Asegura que la vista se inicialice correctamente
+        }
+
+        function closeCustomizer() {
+            document.getElementById('customizerModal').classList.remove('opacity-100');
+            // Timeout para esperar que termine la transición antes de ocultar
+            setTimeout(() => {
+                document.getElementById('customizerModal').classList.add('hidden');
+            }, 300);
+        }
+
+        // --- 5. LÓGICA DEL FORMULARIO DE CONTACTO ---
+
+        function closeCustomizerAndPrefill(e) {
+            e.preventDefault();
+            
+            // 1. Cierra el modal de diseño
+            closeCustomizer();
+            
+            // 2. Selecciona la información del producto y talle
+            const product = activeProduct;
+            const color = activeColor;
+            let sizeOrDetail = 'N/A';
+            if (product === 'Camiseta') {
+                sizeOrDetail = document.getElementById('shirtSize').value;
+            }
+            
+            // 3. Rellena los campos ocultos del formulario de contacto
+            document.getElementById('selectedProductInput').value = `${product} (${color})`;
+            document.getElementById('selectedSizeColorInput').value = sizeOrDetail;
+
+            // 4. Se asegura de que el mensaje tenga un valor inicial claro
+            const messageField = document.getElementById('message');
+            if (!messageField.value || messageField.value.trim() === '') {
+                messageField.value = `¡Hola! Me gustaría cotizar este diseño para un(a) ${product} color ${color} ${sizeOrDetail.toLowerCase()}.`;
+            }
+            
+            // 5. Scrolls hacia la sección de contacto
+            setTimeout(() => {
+                document.getElementById('contacto').scrollIntoView({ behavior: 'smooth' });
+            }, 350);
+        }
+        
+        // **FUNCIÓN CRÍTICA CORREGIDA:** Captura la imagen del diseño y luego envía el formulario.
+        async function submitFormWithDesign(event) {
+            event.preventDefault(); // Detiene el envío inicial
+            
+            const designUrl = overlay.src;
+            const designImageUrlField = document.getElementById('designImageUrl');
+            
+            const submitButton = document.getElementById('submitButton');
+            const submitButtonText = document.getElementById('submitButtonText');
+            const submitSpinner = document.getElementById('submitSpinner');
+            const loadingStatus = document.getElementById('loadingStatus');
+
+            // Habilitar estado de carga
+            submitButton.disabled = true;
+            submitButtonText.textContent = 'Enviando...';
+            submitSpinner.classList.remove('hidden');
+            loadingStatus.classList.remove('hidden');
+            
+            // Si el usuario no subió diseño, envía directamente y salta html2canvas
+            if (overlay.classList.contains('opacity-0') || !designUrl) {
+                loadingStatus.textContent = 'No se detectó un diseño. Enviando solicitud de contacto...';
+                
+                // Asegura que el campo designImageUrl esté vacío
+                designImageUrlField.value = '';
+                
+                // Envía el formulario directamente
+                event.target.submit();
+                return true;
+            }
+
+            loadingStatus.textContent = 'Generando vista previa del diseño... por favor, espera un momento.';
+            
+            try {
+                // Capturar el contenedor de previsualización (producto + diseño)
+                const canvas = await html2canvas(document.getElementById('productBaseContainer'), {
+                    scale: 2, // Aumentar la escala para mejor resolución
+                    useCORS: true, 
+                    logging: false,
+                    allowTaint: true 
+                });
+
+                // Convertir el canvas a URL Base64
+                const base64Image = canvas.toDataURL('image/png');
+                
+                // Asignar la imagen Base64 al campo oculto del formulario
+                designImageUrlField.value = base64Image;
+
+                loadingStatus.textContent = 'Diseño capturado. Enviando formulario...';
+
+                // Enviar el formulario
+                event.target.submit();
+                return true;
+                
+            } catch (error) {
+                console.error("Error al capturar el canvas:", error);
+                
+                // Manejo de errores sin alert
+                loadingStatus.textContent = 'Error al capturar el diseño. Por favor, envía la solicitud directamente y adjunta el archivo si es necesario.';
+                designImageUrlField.value = 'ERROR_CAPTURA_FALLIDA'; 
+                
+                // Deshabilitar estado de carga (fallido)
+                submitButton.disabled = false;
+                submitButtonText.textContent = 'Enviar Solicitud de Cotización';
+                submitSpinner.classList.add('hidden');
+                
+                // Permite el envío estándar (sin imagen)
+                return false; 
+            }
+        }
+
+
+        // --- 6. FUNCIONES DE UTILIDAD (Menú Móvil y Guía de Talles) ---
+        
         function toggleMobileMenu() {
             const menu = document.getElementById('mobileMenu');
             const menuIcon = document.getElementById('menuIcon');
             const closeIcon = document.getElementById('closeIcon');
             
-            menu.classList.toggle('active'); 
-            
-            menuIcon.classList.toggle('hidden', menu.classList.contains('active'));
-            closeIcon.classList.toggle('hidden', !menu.classList.contains('active'));
-        }
-        
-        // --- LÓGICA DEL PERSONALIZADOR ---
-        const designUpload = document.getElementById('designUpload');
-        const designOverlay = document.getElementById('designOverlay');
-        const designPrompt = document.getElementById('designPrompt');
-        const uploadStatus = document.getElementById('uploadStatus');
-        const interactionGuide = document.getElementById('interactionGuide');
-        
-        const sizeGuideTable = document.getElementById('sizeGuideTable');
-        const guideToggleButton = document.getElementById('guideToggleButton');
-        const shirtSizeSelector = document.getElementById('shirtSizeSelector');
-        
-        const baseProductImage = document.getElementById('baseProductImage');
-        const baseColorPlaceholder = document.getElementById('baseColorPlaceholder');
-        const productBaseContainer = document.getElementById('productBaseContainer');
-        const previewBox = document.getElementById('previewBox');
-
-        // Referencias del formulario y loading
-        const contactForm = document.getElementById('contactForm');
-        const designImageUrlInput = document.getElementById('designImageUrl');
-        const selectedProductInput = document.getElementById('selectedProductInput');
-        const selectedSizeColorInput = document.getElementById('selectedSizeColorInput');
-        const submitButton = document.getElementById('submitButton');
-        const submitButtonText = document.getElementById('submitButtonText');
-        const submitSpinner = document.getElementById('submitSpinner');
-        const loadingStatus = document.getElementById('loadingStatus');
-
-        // Definición de Mockups de Producto con rutas relativas
-        const PRODUCT_MOCKUPS = {
-            'Camiseta-Blanca': { 
-                url: 'camiseta_blanca.jpg', 
-                type: 'Camiseta', 
-                name: 'Camiseta Blanca' 
-            },
-            'Camiseta-Negra': { 
-                url: '', 
-                type: 'Camiseta', 
-                name: 'Camiseta Negra' 
-            }, 
-            'Taza-Blanca': { 
-                url: '', 
-                type: 'Taza', 
-                name: 'Taza Blanca' 
-            }, 
-            'Taza-Negra': { 
-                url: '', 
-                type: 'Taza', 
-                name: 'Taza Negra' 
-            }
-        };
-
-        // Estado inicial de la superposición del diseño
-        let designState = {
-            x: 0, 
-            y: 0, 
-            scale: 1, 
-            designUrl: '',
-            isDragging: false,
-            initialTouchDistance: null, 
-            lastX: 0,
-            lastY: 0,
-        };
-        
-        // Área de impresión segura (SAFE_ZONE): 10% de margen a cada lado.
-        const SAFE_ZONE = 0.1; 
-
-        // Función para aplicar la transformación al overlay
-        function applyDesignTransform() {
-            const baseDesignWidth = 150; 
-            const newWidth = baseDesignWidth * designState.scale;
-            designOverlay.style.width = `${newWidth}px`;
-            designOverlay.style.height = `auto`; 
-            designOverlay.style.transform = `translate(-50%, -50%) translate(${designState.x}px, ${designState.y}px)`;
-        }
-        
-        // Función para limitar el movimiento del diseño dentro del área segura
-        function clampDesignPosition() {
-            if (!designState.designUrl) return;
-
-            const containerWidth = productBaseContainer.offsetWidth; 
-            const containerHeight = productBaseContainer.offsetHeight; 
-            const designWidth = designOverlay.offsetWidth;
-            const designHeight = designOverlay.offsetHeight;
-
-            const safeXMargin = containerWidth * SAFE_ZONE;
-            const safeYMargin = containerHeight * SAFE_ZONE;
-            
-            const centerX = containerWidth / 2;
-            const centerY = containerHeight / 2;
-
-            const maxX = (centerX - safeXMargin) - (designWidth / 2);
-            const minX = -maxX;
-            const maxY = (centerY - safeYMargin) - (designHeight / 2);
-            const minY = -maxY;
-
-            designState.x = Math.min(Math.max(designState.x, minX), maxX);
-            designState.y = Math.min(Math.max(designState.y, minY), maxY);
-
-            designState.scale = Math.max(designState.scale, 0.5); 
-            
-            if (designOverlay.classList.contains('opacity-0') === false) {
-                 if (designWidth > containerWidth * (1 - 2 * SAFE_ZONE) || designHeight > containerHeight * (1 - 2 * SAFE_ZONE)) {
-                    designState.x = 0;
-                    designState.y = 0;
-                }
-            }
-           
-            applyDesignTransform();
-        }
-
-        // --- LÓGICA DE INTERACCIÓN (Arrastrar y Escalar) ---
-        function getDistance(touches) {
-            return Math.sqrt(
-                Math.pow(touches[0].pageX - touches[1].pageX, 2) +
-                Math.pow(touches[0].pageY - touches[1].pageY, 2)
-            );
-        }
-
-        designOverlay.addEventListener('mousedown', startDrag);
-        designOverlay.addEventListener('touchstart', startDrag, { passive: false });
-
-        function startDrag(e) {
-            e.preventDefault();
-            if (!designState.designUrl) return;
-
-            designState.isDragging = true;
-            
-            if (e.touches && e.touches.length > 0) {
-                if (e.touches.length === 1) {
-                    designState.lastX = e.touches[0].clientX;
-                    designState.lastY = e.touches[0].clientY;
-                    designState.initialTouchDistance = null; 
-                } else if (e.touches.length >= 2) {
-                    designState.initialTouchDistance = getDistance(e.touches);
-                    designState.lastScale = designState.scale;
-                    designState.isDragging = false; 
-                }
+            if (menu.classList.contains('active')) {
+                menu.classList.remove('active');
+                menuIcon.classList.remove('hidden');
+                closeIcon.classList.add('hidden');
             } else {
-                designState.lastX = e.clientX;
-                designState.lastY = e.clientY;
-                document.addEventListener('mousemove', drag);
-                document.addEventListener('mouseup', endDrag);
+                menu.classList.add('active');
+                menuIcon.classList.add('hidden');
+                closeIcon.classList.remove('hidden');
             }
         }
         
-        designOverlay.addEventListener('touchmove', drag, { passive: false });
-
-        function drag(e) {
-            if (!designState.designUrl) return;
-            e.preventDefault(); 
-
-            if (e.touches && e.touches.length > 0) {
-                if (e.touches.length === 1 && designState.isDragging) {
-                    const deltaX = e.touches[0].clientX - designState.lastX;
-                    const deltaY = e.touches[0].clientY - designState.lastY;
-
-                    designState.x += deltaX;
-                    designState.y += deltaY;
-
-                    designState.lastX = e.touches[0].clientX;
-                    designState.lastY = e.touches[0].clientY;
-                } else if (e.touches.length >= 2 && designState.initialTouchDistance !== null) {
-                    const currentDistance = getDistance(e.touches);
-                    const scaleFactor = currentDistance / designState.initialTouchDistance;
-                    designState.scale = designState.lastScale * scaleFactor;
-                }
-            } else if (designState.isDragging) {
-                const deltaX = e.clientX - designState.lastX;
-                const deltaY = e.clientY - designState.lastY;
-
-                designState.x += deltaX;
-                designState.y += deltaY;
-
-                designState.lastX = e.clientX;
-                designState.lastY = e.clientY;
-            }
-            
-            clampDesignPosition();
-        }
-
-        designOverlay.addEventListener('touchend', endDrag);
-
-        function endDrag(e) {
-            designState.isDragging = false;
-            designState.initialTouchDistance = null;
-            document.removeEventListener('mousemove', drag);
-            document.removeEventListener('mouseup', endDrag);
-            clampDesignPosition();
-        }
-
-        designOverlay.addEventListener('wheel', function(e) {
-            if (!designState.designUrl) return;
-            e.preventDefault(); 
-
-            const zoomAmount = e.deltaY > 0 ? -0.1 : 0.1; 
-            designState.scale += zoomAmount;
-            
-            clampDesignPosition(); 
-        });
-
-        // --- FUNCIONES DEL MODAL Y VISTA ---
-
-        function openCustomizer(event) {
-            if (event) event.preventDefault();
-            const modal = document.getElementById('customizerModal');
-            modal.classList.remove('hidden');
-            // Aplicar la animación de entrada
-            modal.querySelector('.bg-gray-50').classList.add('modal-open-animation');
-            setTimeout(() => modal.classList.add('opacity-100'), 10);
-            updateProductView(); 
-        }
-
-        function closeCustomizer() {
-            const modal = document.getElementById('customizerModal');
-            modal.classList.remove('opacity-100');
-            modal.querySelector('.bg-gray-50').classList.remove('modal-open-animation');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-        }
-
-        function updateProductView() {
-            const productType = document.querySelector('input[name="productType"]:checked').value;
-            const productColor = document.querySelector('input[name="productColor"]:checked').value;
-            const key = `${productType}-${productColor}`;
-            const product = PRODUCT_MOCKUPS[key];
-            const isShirt = productType === 'Camiseta';
-
-            // 1. Alternar Controles Específicos
-            shirtSizeSelector.style.maxHeight = isShirt ? '500px' : '0';
-            shirtSizeSelector.style.paddingTop = isShirt ? '2rem' : '0';
-            shirtSizeSelector.style.borderTop = isShirt ? '1px solid #e5e7eb' : 'none';
-            shirtSizeSelector.style.marginBottom = isShirt ? '1rem' : '0'; 
-
-            // 2. Actualizar Mockup de Producto Base
-            productBaseContainer.classList.toggle('aspect-ratio-portrait', isShirt);
-            productBaseContainer.classList.toggle('aspect-ratio-square', !isShirt);
-
-            baseProductImage.src = product.url || '';
-            
-            if (!product.url) {
-                baseProductImage.style.display = 'none';
-                baseColorPlaceholder.classList.remove('hidden');
-            } else {
-                baseProductImage.style.display = 'block';
-                baseColorPlaceholder.classList.add('hidden');
-            }
-            
-            productBaseContainer.style.backgroundColor = 'transparent';
-
-            if (!product.url) {
-                if (productColor === 'Blanca') {
-                    productBaseContainer.style.backgroundColor = '#f9fafb'; 
-                    document.getElementById('productMockupIcon').classList.remove('text-gray-200');
-                    document.getElementById('productMockupIcon').classList.add('text-gray-400');
-                    baseColorPlaceholder.querySelector('p:first-child').classList.remove('text-gray-200');
-                    baseColorPlaceholder.querySelector('p:first-child').classList.add('text-gray-800');
-                } else if (productColor === 'Negra') {
-                    productBaseContainer.style.backgroundColor = '#4b5563'; 
-                    document.getElementById('productMockupIcon').classList.remove('text-gray-400');
-                    document.getElementById('productMockupIcon').classList.add('text-gray-200');
-                    baseColorPlaceholder.querySelector('p:first-child').classList.remove('text-gray-800');
-                    baseColorPlaceholder.querySelector('p:first-child').classList.add('text-gray-200');
-                }
-
-                baseColorPlaceholder.querySelector('p:first-child').textContent = product.name;
-
-                const svg = document.getElementById('productMockupIcon');
-                const iconClass = isShirt ? 'lucide lucide-shirt' : 'lucide lucide-coffee';
-                const iconPath = isShirt ? '<path d="M20.3 3.3a2 2 0 0 0-2.6.4l-4.2 3.8L9 3.7c-.5-.4-1-.7-1.7-.7s-1.2.3-1.7.7L2.3 8.2a2 2 0 0 0-.4 2.6l4.2 3.8V21a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6.4l4.2-3.8a2 2 0 0 0-.4-2.6z"/>' : '<path d="M10 2v2"/><path d="M14 2v2"/><path d="M8 21h8"/><path d="M8 21a2 2 0 0 1-2-2v-3H4a2 2 0 0 1-2-2V7h20v7a2 2 0 0 1-2 2h-2v3a2 2 0 0 1-2 2z"/><path d="M16 16v-3a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v3"/>';
-                svg.innerHTML = iconPath;
-                svg.className.baseVal = iconClass + ' mb-2 text-gray-400';
-            }
-
-            // 3. Ajustar Overlay de Diseño (posición)
-            clampDesignPosition();
-        }
-
-        // Función para manejar la subida de la imagen del diseño
-        designUpload.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    designState.designUrl = event.target.result;
-                    designState.x = 0; 
-                    designState.y = 0; 
-                    designState.scale = 1; 
-
-                    designOverlay.src = designState.designUrl;
-                    designOverlay.classList.remove('opacity-0');
-                    designPrompt.classList.add('hidden');
-                    interactionGuide.classList.remove('hidden');
-
-                    clampDesignPosition(); 
-                    uploadStatus.textContent = `Archivo: ${file.name} cargado.`;
-                    uploadStatus.classList.remove('hidden', 'text-red-500', 'text-gray-500');
-                    uploadStatus.classList.add('text-primary');
-                };
-                reader.onerror = function() {
-                    uploadStatus.textContent = "Error al cargar el archivo.";
-                    uploadStatus.classList.remove('hidden', 'text-primary', 'text-gray-500');
-                    uploadStatus.classList.add('text-red-500');
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // Función para reiniciar el personalizador
-        function resetDesign() {
-            // Reiniciar estado
-            designState = {
-                x: 0,
-                y: 0,
-                scale: 1,
-                designUrl: '',
-                isDragging: false,
-                initialTouchDistance: null, 
-                lastX: 0,
-                lastY: 0,
-            };
-
-            // Reiniciar DOM
-            designOverlay.src = '';
-            designOverlay.classList.add('opacity-0');
-            designPrompt.classList.remove('hidden');
-            interactionGuide.classList.add('hidden');
-            
-            // Revertir a la vista predeterminada (Camiseta Blanca)
-            document.getElementById('colorWhite').checked = true;
-            document.querySelector('input[name="productType"][value="Camiseta"]').checked = true;
-            
-            updateProductView();
-            applyDesignTransform();
-            
-            uploadStatus.textContent = "Vista previa reiniciada.";
-            uploadStatus.classList.remove('hidden', 'text-primary', 'text-red-500');
-            uploadStatus.classList.add('text-gray-500');
-        }
-
-        // Función para mostrar/ocultar la guía de talles
+        // **FUNCIÓN CRÍTICA CORREGIDA:** Alterna la visibilidad de la tabla de talles.
         function toggleSizeGuide() {
-            const isHidden = sizeGuideTable.style.maxHeight === '0px' || sizeGuideTable.style.maxHeight === '';
+            const guide = document.getElementById('sizeGuideTable');
+            const toggleText = document.getElementById('sizeGuideToggleText');
             
-            if (isHidden) {
-                sizeGuideTable.style.maxHeight = sizeGuideTable.scrollHeight + "px";
-                guideToggleButton.textContent = "Ver Guía de Talles (Cerrar)";
-                sizeGuideTable.style.padding = '1rem';
+            if (guide.classList.contains('active')) {
+                guide.classList.remove('active');
+                toggleText.textContent = 'Mostrar Guía de Talles';
             } else {
-                sizeGuideTable.style.maxHeight = '0px';
-                guideToggleButton.textContent = "Ver Guía de Talles (Abrir)";
-                sizeGuideTable.style.padding = '0 1rem'; 
+                guide.classList.add('active');
+                toggleText.textContent = 'Ocultar Guía de Talles';
             }
         }
-        
-        function closeSizeGuideWithoutAnimation() {
-            sizeGuideTable.style.maxHeight = '0px';
-            sizeGuideTable.style.padding = '0 1rem';
-            guideToggleButton.textContent = "Ver Guía de Talles (Abrir)";
+
+
+        // --- 7. INICIALIZACIÓN DE GOOGLE MAPS ---
+
+        // **FUNCIÓN CRÍTICA CORREGIDA:** Inicializa el mapa de Google Maps.
+        function initMap() {
+            // Coordenadas de ejemplo para Tarragona (cerca de Tarraco Arena)
+            const tarragonaLocation = { lat: 41.119, lng: 1.259 };
+            
+            const map = new google.maps.Map(document.getElementById('contactMap'), {
+                zoom: 16,
+                center: tarragonaLocation,
+                mapId: "SYMF_PRINT_MAP", // ID de estilo de mapa personalizado
+                streetViewControl: false
+            });
+
+            // Eliminar el loader después de cargar el mapa
+            document.getElementById('mapLoader').style.display = 'none';
+
+            // Marcador en la ubicación
+            new google.maps.Marker({
+                position: tarragonaLocation,
+                map: map,
+                title: 'SYMF Print - Taller y Showroom'
+            });
         }
-        
-        // --- MODAL DE CONFIRMACIÓN (Reemplaza a showCustomAlert) ---
-        function showCustomModal(title, message, type) {
-            const modal = document.getElementById('statusModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalMessage = document.getElementById('modalMessage');
-            const modalContent = document.getElementById('modalContent');
-
-            modalTitle.textContent = title;
-            modalMessage.textContent = message;
-
-            modalContent.classList.remove('bg-green-100', 'bg-red-100', 'border-green-500', 'border-red-500');
-            
-            if (type === 'success') {
-                modalTitle.classList.remove('text-red-600');
-                modalTitle.classList.add('text-green-600');
-                modalContent.classList.add('bg-green-100', 'border-4', 'border-green-500');
-            } else { // error
-                modalTitle.classList.remove('text-green-600');
-                modalTitle.classList.add('text-red-600');
-                modalContent.classList.add('bg-red-100', 'border-4', 'border-red-500');
-            }
-            
-            // Mostrar modal con animación
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.add('opacity-100');
-                modalContent.classList.remove('scale-90');
-                modalContent.classList.add('scale-100');
-            }, 10);
-        }
-        
-        function closeCustomModal() {
-            const modal = document.getElementById('statusModal');
-            const modalContent = document.getElementById('modalContent');
-            
-            modal.classList.remove('opacity-100');
-            modalContent.classList.remove('scale-100');
-            modalContent.classList.add('scale-90');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
-        }
-
-        // --- FUNCIÓN CLAVE PARA ENVIAR EL FORMULARIO CON LA IMAGEN (Fetch AJAX) ---
-        async function submitFormWithDesign(event) {
-            event.preventDefault(); // Detener el envío nativo del formulario
-
-            // 1. Estado de Carga: Capturando Diseño
-            loadingStatus.classList.remove('hidden');
-            submitButton.disabled = true;
-            submitButtonText.textContent = "Capturando Diseño...";
-
-            let imageUrlBase64 = null;
-            let success = false;
-            
-            try {
-                // Capturar el diseño con html2canvas
-                const previewElement = document.getElementById('previewBox');
-                const canvas = await html2canvas(previewElement, {
-                    ignoreElements: (element) => element.id === 'designPrompt',
-                    useCORS: true, 
-                    scale: 2, 
-                });
-
-                // Convertir a Base64
-                imageUrlBase64 = canvas.toDataURL('image/jpeg', 0.9);
-
-            } catch (error) {
-                console.error("Error al capturar el diseño:", error);
-                // Si falla la captura, usamos un mensaje de error y seguimos sin imagen
-                imageUrlBase64 = "ERROR_CAPTURA: El diseño no pudo ser capturado.";
-                // Usamos el modal para el aviso
-                showCustomModal("Aviso", "Hubo un pequeño error al capturar el diseño. ¡No te preocupes! El formulario se enviará, pero el diseño no irá adjunto. Por favor, envíalo por WhatsApp.", 'error');
-            }
-            
-            // 2. Estado de Carga: Enviando Formulario
-            loadingStatus.textContent = "Enviando solicitud, por favor espera...";
-            submitButtonText.textContent = "Enviando...";
-            submitSpinner.classList.remove('hidden');
-
-            try {
-                // Rellenar campos ocultos con datos capturados
-                designImageUrlInput.value = imageUrlBase64;
-                
-                const productType = document.querySelector('input[name="productType"]:checked').value;
-                const productColor = document.querySelector('input[name="productColor"]:checked').value;
-                selectedProductInput.value = `${productType} ${productColor}`;
-
-                if (productType === 'Camiseta') {
-                    const shirtSize = document.getElementById('shirtSize').value;
-                    selectedSizeColorInput.value = shirtSize;
-                } else {
-                    selectedSizeColorInput.value = 'N/A';
-                }
-
-                // Obtener datos del formulario
-                const formData = new FormData(contactForm);
-                const formAction = contactForm.getAttribute('action');
-                
-                // 3. Enviar Formulario con FETCH (AJAX)
-                const response = await fetch(formAction, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    success = true;
-                    showCustomModal("¡Éxito!", "Tu solicitud de cotización ha sido enviada. ¡Te contactaremos en las próximas 24 horas!", 'success');
-                    contactForm.reset(); 
-                    resetDesign(); 
-                } else {
-                    showCustomModal("Error de Envío", "Hubo un problema con el servidor al enviar tu solicitud. Inténtalo de nuevo.", 'error');
-                }
-
-            } catch (error) {
-                console.error("Error en la conexión o en el envío:", error);
-                showCustomModal("Error de Conexión", "No se pudo completar el envío del formulario. Verifica tu conexión a internet.", 'error');
-            } finally {
-                // 4. Finalizar Estado de Carga
-                submitButton.disabled = false;
-                submitButtonText.textContent = "Enviar Solicitud de Cotización";
-                submitSpinner.classList.add('hidden');
-                loadingStatus.classList.add('hidden');
-                loadingStatus.textContent = "Generando vista previa del diseño... por favor, espera un momento."; // Restaurar mensaje
-            }
-        }
-        
-        // Inicializar la vista y el mapa al cargar la ventana
-        window.onload = function() {
-            updateProductView();
-            closeSizeGuideWithoutAnimation(); 
-            loadGoogleMapsScript(); // Cargar Google Maps
-        }
-
-        // Lógica para reajustar límites al cambiar el tamaño de la ventana
-        window.addEventListener('resize', clampDesignPosition);
-
     </script>
 </body>
 </html>
