@@ -3,16 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creatividad Impresa | Sublimación y Estampados Profesionales</title>
+    <title>SYMF Print | Sublimación y Estampados Profesionales</title>
     <!-- Carga de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Librería para Captura de pantalla (Capturar el diseño final) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
-    <!-- Carga de Leaflet CSS (Requerido para el mapa de OpenStreetMap) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha2d14-rK4vR1j4z3wGv29609fT5z3x0m8wQx4g6g7L1T8F70E7J6z7J7z9x5c5Q=="
-          crossorigin=""/>
     
     <!-- Configuración para usar la fuente Inter y un esquema de color personalizado -->
     <script>
@@ -37,11 +32,17 @@
                         subtlePulse: {
                             '0%, 100%': { transform: 'scale(1)' },
                             '50%': { transform: 'scale(1.02)' },
+                        },
+                        // Animación para el icono de carga (spin)
+                        spin: {
+                            '0%': { transform: 'rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg)' },
                         }
                     },
                     animation: {
                         'pulse-shadow': 'pulseShadow 2s infinite ease-in-out',
                         'subtle-pulse': 'subtlePulse 4s infinite ease-in-out',
+                        'spin': 'spin 1s linear infinite',
                     }
                 }
             }
@@ -54,7 +55,7 @@
             box-shadow: 0 0 0 2px #4FC3F7; /* Anillo de enfoque primario (Celeste) */
         }
         
-        /* Estilo necesario para que Leaflet funcione correctamente */
+        /* Estilo necesario para que el mapa ocupe el espacio */
         #contactMap {
             width: 100%;
             height: 100%;
@@ -141,6 +142,18 @@
             box-shadow: 0 0 20px rgba(34, 197, 94, 0.8);
             transform: scale(1.05); /* Ligeramente más grande */
         }
+        
+        /* Estilos para el menú móvil - transiciones suaves */
+        #mobileMenu {
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        #mobileMenu.active {
+            max-height: 500px; /* Suficiente altura para el contenido */
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -151,9 +164,11 @@
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
             <!-- LOGO CON ANIMACIÓN AL HOVER -->
             <a href="#" class="text-3xl font-extrabold tracking-tight flex items-center hover:scale-[1.03] transition duration-300">
-                <span class="text-white">Atelier</span>
+                <span class="text-white">SYMF</span>
                 <span class="text-primary ml-2 hover:text-secondary transition duration-300">Print</span>
             </a>
+            
+            <!-- Enlaces de navegación (Desktop) -->
             <div class="hidden md:flex space-x-8">
                 <a href="#inicio" class="text-gray-200 hover:text-primary transition duration-300 font-medium hover:scale-105">Inicio</a>
                 <a href="#servicios" class="text-gray-200 hover:text-primary transition duration-300 font-medium hover:scale-105">Servicios</a>
@@ -161,10 +176,25 @@
                 <a href="#galeria" class="text-gray-200 hover:text-primary transition duration-300 font-medium hover:scale-105">Galería</a>
                 <a href="#contacto" class="text-dark-bg bg-secondary py-2 px-4 rounded-full hover:bg-yellow-300 transition duration-300 font-medium shadow-lg hover:shadow-xl hover:scale-105">Contacto</a>
             </div>
-            <button class="md:hidden p-2 text-primary hover:text-sky-600 transition duration-300 rounded-lg font-bold">
-                Menú
+            
+            <!-- Botón de Menú (Mobile) - Añadido ID y onclick -->
+            <button id="mobileMenuButton" onclick="toggleMobileMenu()" class="md:hidden p-2 text-primary hover:text-sky-600 transition duration-300 rounded-lg font-bold">
+                <svg id="menuIcon" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+                <svg id="closeIcon" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x hidden"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
             </button>
         </nav>
+        
+        <!-- Menú Móvil Desplegable (Hidden por defecto en desktop) -->
+        <div id="mobileMenu" class="md:hidden bg-dark-bg/90 border-t border-primary/20">
+            <div class="pt-2 pb-3 space-y-1 px-4 sm:px-6">
+                <!-- Los enlaces ahora tienen un evento onClick para cerrar el menú al hacer clic -->
+                <a href="#inicio" onclick="toggleMobileMenu()" class="block text-gray-200 hover:bg-primary/20 hover:text-primary transition duration-300 font-medium py-2 px-3 rounded-lg">Inicio</a>
+                <a href="#servicios" onclick="toggleMobileMenu()" class="block text-gray-200 hover:bg-primary/20 hover:text-primary transition duration-300 font-medium py-2 px-3 rounded-lg">Servicios</a>
+                <a href="#" onclick="openCustomizer(event); toggleMobileMenu();" class="block text-gray-200 hover:bg-primary/20 hover:text-primary transition duration-300 font-medium py-2 px-3 rounded-lg">Diseña Ahora</a>
+                <a href="#galeria" onclick="toggleMobileMenu()" class="block text-gray-200 hover:bg-primary/20 hover:text-primary transition duration-300 font-medium py-2 px-3 rounded-lg">Galería</a>
+                <a href="#contacto" onclick="toggleMobileMenu()" class="block text-dark-bg bg-secondary hover:bg-yellow-300 transition duration-300 font-medium py-2 px-3 rounded-lg text-center mt-2">Contacto</a>
+            </div>
+        </div>
     </header>
 
     <main>
@@ -248,18 +278,20 @@
             </div>
         </section>
 
-        <!-- Sección de Ubicación y Contacto con MAPA FUNCIONAL -->
+        <!-- Sección de Ubicación y Contacto con MAPA GOOGLE MAPS -->
         <section id="ubicacion" class="py-20 bg-gray-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <h2 class="text-4xl font-bold text-gray-900 mb-4">Encuéntranos en Tarragona</h2>
                 <p class="text-xl text-gray-600 mb-8">Estamos cerca de la histórica Tarraco Arena (Antigua Plaza de Toros).</p>
                 
                 <!-- CONTENEDOR DEL MAPA (ID: contactMap) -->
-                <div id="contactMap" class="rounded-2xl overflow-hidden shadow-2xl border-4 border-primary w-full max-w-4xl mx-auto" style="height: 400px;">
-                    <!-- El mapa interactivo de Leaflet se cargará aquí al iniciar JS -->
-                    <div class="w-full h-full flex items-center justify-center bg-gray-200/50 p-8 text-center">
-                        <div class="text-gray-700">Cargando Mapa...</div>
-                    </div>
+                <div class="rounded-2xl overflow-hidden shadow-2xl border-4 border-primary w-full max-w-4xl mx-auto" style="height: 400px;">
+                     <div id="contactMap">
+                         <!-- El mapa de Google Maps se cargará aquí -->
+                         <div id="mapLoader" class="w-full h-full flex items-center justify-center bg-gray-200/50 p-8 text-center">
+                             <div class="text-gray-700">Cargando Mapa...</div>
+                         </div>
+                     </div>
                 </div>
 
             </div>
@@ -283,8 +315,8 @@
                     <!-- FORMULARIO REAL CONECTADO A FORMSUBMIT -->
                     <form id="contactForm" action="https://formsubmit.co/ellsanty123@gmail.com" method="POST" class="space-y-6" onsubmit="return submitFormWithDesign(event)">
                         
-                        <!-- Campo oculto para definir el asunto del email -->
-                        <input type="hidden" name="_subject" value="Nueva Solicitud de Cotización (Atelier Print)">
+                        <!-- Campo oculto para definir el asunto del email (Cambiado a SYMF Print) -->
+                        <input type="hidden" name="_subject" value="Nueva Solicitud de Cotización (SYMF Print)">
                         
                         <!-- CAMPO OCULTO PARA LA IMAGEN DEL DISEÑO (Base64) -->
                         <input type="hidden" name="design_image_url" id="designImageUrl">
@@ -305,8 +337,12 @@
                             <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Detalles del Proyecto (Cantidad, Tipo de Producto, Diseño)</label>
                             <textarea id="message" name="message" rows="4" required class="input-focus mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 transition duration-150"></textarea>
                         </div>
-                        <button type="submit" id="submitButton" class="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-sky-600 transition duration-300 transform hover:scale-[1.01] shadow-lg hover:shadow-xl">
-                            Enviar Solicitud de Cotización
+                        <button type="submit" id="submitButton" class="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-sky-600 transition duration-300 transform hover:scale-[1.01] shadow-lg hover:shadow-xl flex items-center justify-center">
+                            <svg id="submitSpinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span id="submitButtonText">Enviar Solicitud de Cotización</span>
                         </button>
                     </form>
                     <div id="loadingStatus" class="mt-4 text-center text-primary font-semibold hidden">
@@ -320,7 +356,7 @@
     <!-- MODAL DEL PERSONALIZADOR (Fuera de <main> y oculto) -->
     <div id="customizerModal" class="fixed inset-0 z-[100] bg-dark-bg/95 backdrop-blur-sm hidden overflow-y-auto transition-opacity duration-300 opacity-0">
         <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-            <div class="bg-gray-50 p-6 md:p-8 rounded-3xl shadow-2xl relative modal-content-animation">
+            <div class="bg-gray-50 p-6 md:p-8 rounded-3xl shadow-2xl relative modal-open-animation">
                 
                 <!-- Botón de Cierre -->
                 <button onclick="closeCustomizer()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition duration-300 p-2 rounded-full bg-white shadow-lg z-20 hover:scale-110">
@@ -496,13 +532,92 @@
         </div>
     </div>
 
-    <!-- Carga de Leaflet JavaScript (Va antes de tu script principal) -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            integrity="sha2d14-AHzjU/pMhS00sC9PjG3j0x1F2B1r8hV5x5w9u2p4e0T3J4I5L6S4X9J3p9M8X7N7S0Y3D2L5T9W3M4A9V5"
-            crossorigin=""></script>
+    <!-- Modal de Confirmación Global (Añadido para mensajes de éxito/error del formulario) -->
+    <div id="statusModal" class="fixed inset-0 z-[110] bg-dark-bg/80 backdrop-blur-sm hidden flex items-center justify-center transition-opacity duration-300 opacity-0">
+        <div id="modalContent" class="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center transform scale-90 transition duration-300">
+            <h3 id="modalTitle" class="text-2xl font-bold mb-3"></h3>
+            <p id="modalMessage" class="text-gray-600 mb-6"></p>
+            <button onclick="closeCustomModal()" class="bg-primary text-white font-semibold py-2 px-6 rounded-full hover:bg-sky-600 transition duration-300">
+                Aceptar
+            </button>
+        </div>
+    </div>
 
-    <!-- JavaScript para el Formulario y el Personalizador -->
+    <!-- Script de Inicialización del Mapa de Google Maps -->
     <script>
+        // *** IMPORTANTE: TU CLAVE DE API DE GOOGLE MAPS INSERTADA AQUÍ ***
+        const googleMapsApiKey = "AIzaSyCILSQvZqz9G1XqFnDX54esJDmoedAC1YM";
+        
+        const TARRAGONA_COORDS = { lat: 41.1166, lng: 1.2500 }; 
+        const MAP_ZOOM = 14;
+
+        // Función que Google Maps llama al cargarse
+        function initMap() {
+            const mapElement = document.getElementById('contactMap');
+            const mapLoader = document.getElementById('mapLoader');
+            
+            if (mapLoader) {
+                 mapLoader.remove(); // Eliminar el loader si el mapa se carga
+            }
+            
+            const map = new google.maps.Map(mapElement, {
+                center: TARRAGONA_COORDS,
+                zoom: MAP_ZOOM,
+                disableDefaultUI: false, // Puedes dejar los controles por defecto
+                mapId: 'DEMO_MAP_ID' 
+            });
+
+            new google.maps.Marker({
+                position: TARRAGONA_COORDS,
+                map: map,
+                title: 'SYMF Print - Ubicación en Tarragona',
+            });
+            
+            console.log('Mapa de Google Maps inicializado en Tarragona.');
+        }
+
+        // Esta función se llama si falla la carga o autenticación del API de Google Maps
+        window.gm_authFailure = function() {
+            console.error("Error de autenticación de Google Maps. Asegúrate de que la clave API sea válida.");
+            const mapContainer = document.getElementById('contactMap');
+            mapContainer.innerHTML = `
+                <div class="w-full h-full flex flex-col items-center justify-center bg-red-100/70 text-red-700 p-8 text-center rounded-xl">
+                    <svg class="w-10 h-10 text-red-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <p class="font-bold text-lg mb-2">Mapa No Disponible</p>
+                    <p class="text-sm">La clave de API de Google Maps no está configurada o es inválida. Edita el código para insertarla.</p>
+                </div>
+            `;
+        };
+
+        // Lógica para cargar el script de Google Maps
+        function loadGoogleMapsScript() {
+            const mapElement = document.getElementById('contactMap');
+            mapElement.style.height = '400px'; 
+            
+            if (!googleMapsApiKey || googleMapsApiKey === "TU_CLAVE_API_AQUI") {
+                 window.gm_authFailure();
+                 return;
+            }
+            
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&callback=initMap`;
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        }
+        
+        // --- LÓGICA DEL MENÚ MÓVIL ---
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const menuIcon = document.getElementById('menuIcon');
+            const closeIcon = document.getElementById('closeIcon');
+            
+            menu.classList.toggle('active'); 
+            
+            menuIcon.classList.toggle('hidden', menu.classList.contains('active'));
+            closeIcon.classList.toggle('hidden', !menu.classList.contains('active'));
+        }
+        
         // --- LÓGICA DEL PERSONALIZADOR ---
         const designUpload = document.getElementById('designUpload');
         const designOverlay = document.getElementById('designOverlay');
@@ -519,23 +634,23 @@
         const productBaseContainer = document.getElementById('productBaseContainer');
         const previewBox = document.getElementById('previewBox');
 
-        // Referencias del formulario
+        // Referencias del formulario y loading
         const contactForm = document.getElementById('contactForm');
         const designImageUrlInput = document.getElementById('designImageUrl');
         const selectedProductInput = document.getElementById('selectedProductInput');
         const selectedSizeColorInput = document.getElementById('selectedSizeColorInput');
         const submitButton = document.getElementById('submitButton');
+        const submitButtonText = document.getElementById('submitButtonText');
+        const submitSpinner = document.getElementById('submitSpinner');
         const loadingStatus = document.getElementById('loadingStatus');
 
         // Definición de Mockups de Producto con rutas relativas
         const PRODUCT_MOCKUPS = {
-            // Se asume que 'camiseta_blanca.jpg' ha sido cargado en el entorno
             'Camiseta-Blanca': { 
-                url: 'camiseta_blanca.jpg', // Ruta de la imagen subida o disponible
+                url: 'camiseta_blanca.jpg', 
                 type: 'Camiseta', 
                 name: 'Camiseta Blanca' 
             },
-            // Si no hay mockup físico, usamos un color plano (background-color)
             'Camiseta-Negra': { 
                 url: '', 
                 type: 'Camiseta', 
@@ -553,7 +668,7 @@
             }
         };
 
-        // Estado inicial de la superposición del diseño (AHORA DINÁMICO)
+        // Estado inicial de la superposición del diseño
         let designState = {
             x: 0, 
             y: 0, 
@@ -579,14 +694,10 @@
         
         // Función para limitar el movimiento del diseño dentro del área segura
         function clampDesignPosition() {
-            // Solo limitar si hay un diseño cargado
             if (!designState.designUrl) return;
 
-            const containerRect = productBaseContainer.getBoundingClientRect();
-            const containerWidth = productBaseContainer.offsetWidth; // Usar offsetWidth para el tamaño actual
-            const containerHeight = productBaseContainer.offsetHeight; // Usar offsetHeight
-
-            // Forzar reflow para obtener dimensiones correctas
+            const containerWidth = productBaseContainer.offsetWidth; 
+            const containerHeight = productBaseContainer.offsetHeight; 
             const designWidth = designOverlay.offsetWidth;
             const designHeight = designOverlay.offsetHeight;
 
@@ -596,22 +707,16 @@
             const centerX = containerWidth / 2;
             const centerY = containerHeight / 2;
 
-            // Calcular límites de movimiento (la posición 'x' y 'y' son relativas al centro del contenedor)
-            // Límite máximo positivo: (Centro del Contenedor - Margen de Zona Segura) - (Mitad del Diseño)
             const maxX = (centerX - safeXMargin) - (designWidth / 2);
             const minX = -maxX;
             const maxY = (centerY - safeYMargin) - (designHeight / 2);
             const minY = -maxY;
 
-            // Aplicar clamping al movimiento
             designState.x = Math.min(Math.max(designState.x, minX), maxX);
             designState.y = Math.min(Math.max(designState.y, minY), maxY);
 
-            // Asegurar un zoom mínimo
             designState.scale = Math.max(designState.scale, 0.5); 
             
-            // Si el diseño es más grande que el área segura, forzar al centro (para evitar que se salga)
-            // Solo se hace si el diseño ES visible
             if (designOverlay.classList.contains('opacity-0') === false) {
                  if (designWidth > containerWidth * (1 - 2 * SAFE_ZONE) || designHeight > containerHeight * (1 - 2 * SAFE_ZONE)) {
                     designState.x = 0;
@@ -619,12 +724,10 @@
                 }
             }
            
-
             applyDesignTransform();
         }
 
         // --- LÓGICA DE INTERACCIÓN (Arrastrar y Escalar) ---
-
         function getDistance(touches) {
             return Math.sqrt(
                 Math.pow(touches[0].pageX - touches[1].pageX, 2) +
@@ -744,21 +847,18 @@
             shirtSizeSelector.style.maxHeight = isShirt ? '500px' : '0';
             shirtSizeSelector.style.paddingTop = isShirt ? '2rem' : '0';
             shirtSizeSelector.style.borderTop = isShirt ? '1px solid #e5e7eb' : 'none';
-            shirtSizeSelector.style.marginBottom = isShirt ? '1rem' : '0'; // Ajustar margen
+            shirtSizeSelector.style.marginBottom = isShirt ? '1rem' : '0'; 
 
             // 2. Actualizar Mockup de Producto Base
             productBaseContainer.classList.toggle('aspect-ratio-portrait', isShirt);
             productBaseContainer.classList.toggle('aspect-ratio-square', !isShirt);
 
-            // Intentar usar la imagen del mockup si existe, si no, usa el placeholder de color
             baseProductImage.src = product.url || '';
             
             if (!product.url) {
-                // Si no hay URL, oculta la imagen y muestra el placeholder
                 baseProductImage.style.display = 'none';
                 baseColorPlaceholder.classList.remove('hidden');
             } else {
-                // Si hay URL, muestra la imagen y oculta el placeholder
                 baseProductImage.style.display = 'block';
                 baseColorPlaceholder.classList.add('hidden');
             }
@@ -766,7 +866,6 @@
             productBaseContainer.style.backgroundColor = 'transparent';
 
             if (!product.url) {
-                // Configurar colores del placeholder
                 if (productColor === 'Blanca') {
                     productBaseContainer.style.backgroundColor = '#f9fafb'; 
                     document.getElementById('productMockupIcon').classList.remove('text-gray-200');
@@ -783,7 +882,6 @@
 
                 baseColorPlaceholder.querySelector('p:first-child').textContent = product.name;
 
-                // Actualizar icono Lucide para que coincida con el producto
                 const svg = document.getElementById('productMockupIcon');
                 const iconClass = isShirt ? 'lucide lucide-shirt' : 'lucide lucide-coffee';
                 const iconPath = isShirt ? '<path d="M20.3 3.3a2 2 0 0 0-2.6.4l-4.2 3.8L9 3.7c-.5-.4-1-.7-1.7-.7s-1.2.3-1.7.7L2.3 8.2a2 2 0 0 0-.4 2.6l4.2 3.8V21a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6.4l4.2-3.8a2 2 0 0 0-.4-2.6z"/>' : '<path d="M10 2v2"/><path d="M14 2v2"/><path d="M8 21h8"/><path d="M8 21a2 2 0 0 1-2-2v-3H4a2 2 0 0 1-2-2V7h20v7a2 2 0 0 1-2 2h-2v3a2 2 0 0 1-2 2z"/><path d="M16 16v-3a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v3"/>';
@@ -859,60 +957,110 @@
 
         // Función para mostrar/ocultar la guía de talles
         function toggleSizeGuide() {
-            // Se invierte la lógica porque la tabla ahora está abierta por defecto
             const isHidden = sizeGuideTable.style.maxHeight === '0px' || sizeGuideTable.style.maxHeight === '';
             
             if (isHidden) {
-                // Abrir
-                // NOTA: Usamos scrollHeight + 'px' para asegurar que se abra al tamaño correcto
                 sizeGuideTable.style.maxHeight = sizeGuideTable.scrollHeight + "px";
                 guideToggleButton.textContent = "Ver Guía de Talles (Cerrar)";
                 sizeGuideTable.style.padding = '1rem';
             } else {
-                // Cerrar
                 sizeGuideTable.style.maxHeight = '0px';
                 guideToggleButton.textContent = "Ver Guía de Talles (Abrir)";
-                sizeGuideTable.style.padding = '0 1rem'; // Mantener padding horizontal por si acaso
+                sizeGuideTable.style.padding = '0 1rem'; 
             }
         }
         
-        // Función para cerrar la guía sin animar (solo para la carga inicial)
         function closeSizeGuideWithoutAnimation() {
             sizeGuideTable.style.maxHeight = '0px';
             sizeGuideTable.style.padding = '0 1rem';
             guideToggleButton.textContent = "Ver Guía de Talles (Abrir)";
         }
         
-        // --- FUNCIÓN CLAVE PARA ENVIAR EL FORMULARIO CON LA IMAGEN ---
-        async function submitFormWithDesign(event) {
-            event.preventDefault(); // Detener el envío del formulario inmediatamente
+        // --- MODAL DE CONFIRMACIÓN (Reemplaza a showCustomAlert) ---
+        function showCustomModal(title, message, type) {
+            const modal = document.getElementById('statusModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalContent = document.getElementById('modalContent');
 
-            // Deshabilitar botón y mostrar carga
-            submitButton.disabled = true;
-            submitButton.textContent = "Enviando...";
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+
+            modalContent.classList.remove('bg-green-100', 'bg-red-100', 'border-green-500', 'border-red-500');
+            
+            if (type === 'success') {
+                modalTitle.classList.remove('text-red-600');
+                modalTitle.classList.add('text-green-600');
+                modalContent.classList.add('bg-green-100', 'border-4', 'border-green-500');
+            } else { // error
+                modalTitle.classList.remove('text-green-600');
+                modalTitle.classList.add('text-red-600');
+                modalContent.classList.add('bg-red-100', 'border-4', 'border-red-500');
+            }
+            
+            // Mostrar modal con animación
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.add('opacity-100');
+                modalContent.classList.remove('scale-90');
+                modalContent.classList.add('scale-100');
+            }, 10);
+        }
+        
+        function closeCustomModal() {
+            const modal = document.getElementById('statusModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            modal.classList.remove('opacity-100');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-90');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // --- FUNCIÓN CLAVE PARA ENVIAR EL FORMULARIO CON LA IMAGEN (Fetch AJAX) ---
+        async function submitFormWithDesign(event) {
+            event.preventDefault(); // Detener el envío nativo del formulario
+
+            // 1. Estado de Carga: Capturando Diseño
             loadingStatus.classList.remove('hidden');
+            submitButton.disabled = true;
+            submitButtonText.textContent = "Capturando Diseño...";
+
+            let imageUrlBase64 = null;
+            let success = false;
             
             try {
-                // 1. Capturar el contenedor de la vista previa
+                // Capturar el diseño con html2canvas
                 const previewElement = document.getElementById('previewBox');
-                
-                // 2. Generar el Canvas a partir del HTML
                 const canvas = await html2canvas(previewElement, {
-                    // Ignorar la capa de texto de ayuda si está visible
                     ignoreElements: (element) => element.id === 'designPrompt',
-                    // Asegura que las imágenes se carguen correctamente
                     useCORS: true, 
-                    // Escala para mejorar la calidad de la imagen resultante (opcional, pero recomendado)
                     scale: 2, 
                 });
 
-                // 3. Convertir el Canvas a una URL de imagen Base64 (JPEG para menor tamaño)
-                const imageUrlBase64 = canvas.toDataURL('image/jpeg', 0.9);
+                // Convertir a Base64
+                imageUrlBase64 = canvas.toDataURL('image/jpeg', 0.9);
 
-                // 4. Llenar el campo oculto con la URL Base64
+            } catch (error) {
+                console.error("Error al capturar el diseño:", error);
+                // Si falla la captura, usamos un mensaje de error y seguimos sin imagen
+                imageUrlBase64 = "ERROR_CAPTURA: El diseño no pudo ser capturado.";
+                // Usamos el modal para el aviso
+                showCustomModal("Aviso", "Hubo un pequeño error al capturar el diseño. ¡No te preocupes! El formulario se enviará, pero el diseño no irá adjunto. Por favor, envíalo por WhatsApp.", 'error');
+            }
+            
+            // 2. Estado de Carga: Enviando Formulario
+            loadingStatus.textContent = "Enviando solicitud, por favor espera...";
+            submitButtonText.textContent = "Enviando...";
+            submitSpinner.classList.remove('hidden');
+
+            try {
+                // Rellenar campos ocultos con datos capturados
                 designImageUrlInput.value = imageUrlBase64;
-
-                // 5. Llenar los campos ocultos de producto
+                
                 const productType = document.querySelector('input[name="productType"]:checked').value;
                 const productColor = document.querySelector('input[name="productColor"]:checked').value;
                 selectedProductInput.value = `${productType} ${productColor}`;
@@ -921,210 +1069,46 @@
                     const shirtSize = document.getElementById('shirtSize').value;
                     selectedSizeColorInput.value = shirtSize;
                 } else {
-                    selectedSizeColorInput.value = 'N/A'; // No aplica talle para la taza
+                    selectedSizeColorInput.value = 'N/A';
                 }
 
-                // 6. Ahora que los datos están cargados, enviar el formulario de forma nativa
-                contactForm.submit();
+                // Obtener datos del formulario
+                const formData = new FormData(contactForm);
+                const formAction = contactForm.getAttribute('action');
+                
+                // 3. Enviar Formulario con FETCH (AJAX)
+                const response = await fetch(formAction, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    success = true;
+                    showCustomModal("¡Éxito!", "Tu solicitud de cotización ha sido enviada. ¡Te contactaremos en las próximas 24 horas!", 'success');
+                    contactForm.reset(); 
+                    resetDesign(); 
+                } else {
+                    showCustomModal("Error de Envío", "Hubo un problema con el servidor al enviar tu solicitud. Inténtalo de nuevo.", 'error');
+                }
 
             } catch (error) {
-                console.error("Error al capturar el diseño o enviar el formulario:", error);
-                
-                // Revertir el estado de carga y habilitar el botón
+                console.error("Error en la conexión o en el envío:", error);
+                showCustomModal("Error de Conexión", "No se pudo completar el envío del formulario. Verifica tu conexión a internet.", 'error');
+            } finally {
+                // 4. Finalizar Estado de Carga
                 submitButton.disabled = false;
-                submitButton.textContent = "Enviar Solicitud de Cotización";
+                submitButtonText.textContent = "Enviar Solicitud de Cotización";
+                submitSpinner.classList.add('hidden');
                 loadingStatus.classList.add('hidden');
-                
-                // Si falla la captura, enviar de todos modos con un placeholder para no perder los datos del cliente
-                if (!designImageUrlInput.value) {
-                    designImageUrlInput.value = "ERROR_CAPTURA: Se recomienda contactar por WhatsApp para enviar la imagen.";
-                }
-                
-                // Usar un modal personalizado en lugar de alert()
-                showCustomAlert("Ocurrió un error al procesar tu diseño. Se enviarán solo los datos de contacto. Por favor, envía la imagen del diseño por separado a través de WhatsApp.", 'error');
-
-                // Forzar el envío del formulario (para que al menos lleguen los datos de contacto)
-                contactForm.submit();
-            }
-            
-            return false; // Prevenimos el envío nativo hasta que el proceso asíncrono termine
-        }
-        
-        // Función de alerta personalizada (Reemplaza a alert() por restricción)
-        function showCustomAlert(message, type) {
-            // Implementación simple de un modal de mensaje en el DOM, ya que no podemos usar alert()
-            let alertBox = document.getElementById('customAlertBox');
-            if (!alertBox) {
-                alertBox = document.createElement('div');
-                alertBox.id = 'customAlertBox';
-                alertBox.className = 'fixed top-5 right-5 z-[101] p-4 rounded-lg shadow-2xl transition duration-500 transform scale-0';
-                document.body.appendChild(alertBox);
-            }
-
-            alertBox.textContent = message;
-            alertBox.style.backgroundColor = type === 'error' ? '#EF4444' : '#10B981';
-            alertBox.style.color = '#fff';
-            
-            // Mostrar y luego ocultar
-            alertBox.classList.remove('scale-0');
-            alertBox.classList.add('scale-100');
-            setTimeout(() => {
-                alertBox.classList.remove('scale-100');
-                alertBox.classList.add('scale-0');
-            }, 5000);
-        }
-
-        // --- LÓGICA DE INTERACCIÓN (Arrastrar y Escalar) ---
-        // (Se movió la lógica de arrastrar/escalar para mantener el código más limpio, pero se mantiene la funcionalidad)
-        // [Inicia lógica de Interacción]...
-
-        function getDistance(touches) {
-            return Math.sqrt(
-                Math.pow(touches[0].pageX - touches[1].pageX, 2) +
-                Math.pow(touches[0].pageY - touches[1].pageY, 2)
-            );
-        }
-
-        designOverlay.addEventListener('mousedown', startDrag);
-        designOverlay.addEventListener('touchstart', startDrag, { passive: false });
-
-        function startDrag(e) {
-            e.preventDefault();
-            if (!designState.designUrl) return;
-
-            designState.isDragging = true;
-            
-            if (e.touches && e.touches.length > 0) {
-                if (e.touches.length === 1) {
-                    designState.lastX = e.touches[0].clientX;
-                    designState.lastY = e.touches[0].clientY;
-                    designState.initialTouchDistance = null; 
-                } else if (e.touches.length >= 2) {
-                    designState.initialTouchDistance = getDistance(e.touches);
-                    designState.lastScale = designState.scale;
-                    designState.isDragging = false; 
-                }
-            } else {
-                designState.lastX = e.clientX;
-                designState.lastY = e.clientY;
-                document.addEventListener('mousemove', drag);
-                document.addEventListener('mouseup', endDrag);
+                loadingStatus.textContent = "Generando vista previa del diseño... por favor, espera un momento."; // Restaurar mensaje
             }
         }
         
-        designOverlay.addEventListener('touchmove', drag, { passive: false });
-
-        function drag(e) {
-            if (!designState.designUrl) return;
-            e.preventDefault(); 
-
-            if (e.touches && e.touches.length > 0) {
-                if (e.touches.length === 1 && designState.isDragging) {
-                    const deltaX = e.touches[0].clientX - designState.lastX;
-                    const deltaY = e.touches[0].clientY - designState.lastY;
-
-                    designState.x += deltaX;
-                    designState.y += deltaY;
-
-                    designState.lastX = e.touches[0].clientX;
-                    designState.lastY = e.touches[0].clientY;
-                } else if (e.touches.length >= 2 && designState.initialTouchDistance !== null) {
-                    const currentDistance = getDistance(e.touches);
-                    const scaleFactor = currentDistance / designState.initialTouchDistance;
-                    designState.scale = designState.lastScale * scaleFactor;
-                }
-            } else if (designState.isDragging) {
-                const deltaX = e.clientX - designState.lastX;
-                const deltaY = e.clientY - designState.lastY;
-
-                designState.x += deltaX;
-                designState.y += deltaY;
-
-                designState.lastX = e.clientX;
-                designState.lastY = e.clientY;
-            }
-            
-            clampDesignPosition();
-        }
-
-        designOverlay.addEventListener('touchend', endDrag);
-
-        function endDrag(e) {
-            designState.isDragging = false;
-            designState.initialTouchDistance = null;
-            document.removeEventListener('mousemove', drag);
-            document.removeEventListener('mouseup', endDrag);
-            clampDesignPosition();
-        }
-
-        designOverlay.addEventListener('wheel', function(e) {
-            if (!designState.designUrl) return;
-            e.preventDefault(); 
-
-            const zoomAmount = e.deltaY > 0 ? -0.1 : 0.1; 
-            designState.scale += zoomAmount;
-            
-            clampDesignPosition(); 
-        });
-
-        // [Fin lógica de Interacción]...
-
-
-        // --- LÓGICA DE INICIALIZACIÓN DEL MAPA ---
-        function initializeMap() {
-            // Coordenadas para Tarragona (cerca de la T. Arena)
-            const tarragonaLat = 41.1166; 
-            const tarragonaLng = 1.2500;  
-            const zoomLevel = 14;
-
-            const mapElement = document.getElementById('contactMap');
-            
-            if (typeof L === 'undefined') {
-                 mapElement.innerHTML = `
-                    <div class="w-full h-full flex items-center justify-center bg-red-100 text-red-700 p-8 text-center">
-                        <p class="font-bold text-lg mb-2">¡Error de Mapa!</p>
-                        <p>La librería de mapas no se cargó. Esto puede ser por un bloqueo de red. Por favor, recarga la página.</p>
-                    </div>
-                `;
-                console.error("Leaflet library (L) is undefined. Check Leaflet script tag.");
-                return;
-            }
-
-            try {
-                // 1. Inicializa el mapa
-                const map = L.map('contactMap').setView([tarragonaLat, tarragonaLng], zoomLevel);
-
-                // 2. Añade la capa de baldosas (tiles) de OpenStreetMap
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(map);
-
-                // 3. Añade un marcador en la ubicación (usamos coordenadas ligeramente más precisas para el centro)
-                L.marker([tarragonaLat, tarragonaLng]).addTo(map)
-                    .bindPopup('<b>Atelier Print</b><br>Nuestra Ubicación en Tarragona')
-                    .openPopup();
-                    
-                console.log('Mapa Leaflet inicializado en Tarragona.');
-
-            } catch (error) {
-                console.error("Error al inicializar el mapa Leaflet:", error);
-                 mapElement.innerHTML = `
-                    <div class="w-full h-full flex items-center justify-center bg-red-100 text-red-700 p-8 text-center">
-                        Hubo un problema al dibujar el mapa. Por favor, verifica tu conexión o la consola del navegador.
-                    </div>
-                `;
-            }
-        }
-
-
-        // Inicializar la vista al cargar
+        // Inicializar la vista y el mapa al cargar la ventana
         window.onload = function() {
             updateProductView();
-            // Cerrar la guía de talles en la carga para no desbordar el modal
             closeSizeGuideWithoutAnimation(); 
-            // Inicializar el mapa
-            initializeMap();
+            loadGoogleMapsScript(); // Cargar Google Maps
         }
 
         // Lógica para reajustar límites al cambiar el tamaño de la ventana
