@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creatividad Impresa | Sublimación y Estampados Profesionales</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configuración para usar la fuente Inter y un esquema de color personalizado -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        // Paleta de Celeste Pastel
+                        'primary': '#4FC3F7', // Celeste Vívido (Para botones y acentos fuertes)
+                        'secondary': '#FFD54F', // Amarillo Suave (Contraste cálido)
+                        'dark-bg': '#263238', // Gris Azulado Oscuro (Fondo de sección)
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos personalizados */
+        .input-focus:focus {
+            box-shadow: 0 0 0 2px #4FC3F7; /* Anillo de enfoque primario (Celeste) */
+        }
+        
+        /* Habilitar la interacción directa para el arrastre y zoom */
+        #designOverlay {
+            pointer-events: auto; /* Permite arrastrar y hacer zoom */
+            cursor: grab;
+            touch-action: none; /* Previene el comportamiento por defecto del scroll/zoom del navegador en móvil */
+        }
+        #designOverlay:active {
+            cursor: grabbing;
+        }
+
+        #customizerModal::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #customizerModal::-webkit-scrollbar-thumb {
+            background-color: #4FC3F7;
+            border-radius: 10px;
+        }
+        
+        /* Contenedor forzando un aspecto 1:1 para los placeholders de color */
+        .product-base {
+            width: 100%;
+            position: relative; 
+            border-radius: 0.75rem; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 4px solid #f9fafb;
+        }
+
+        /* Clase para Camisetas (ej. 4:5 - más vertical) */
+        .aspect-ratio-portrait {
+            padding-top: 125%; 
+        }
+
+        /* Clase para Tazas (ej. 1:1 - cuadrada) */
+        .aspect-ratio-square {
+            padding-top: 100%; 
+        }
+
+        .product-base-inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            border-radius: 0.5rem; 
+        }
+        
+        /* Asegurar que el contenedor del diseño no se mueva con el scroll/zoom del navegador */
+        #previewBox {
+            max-width: 350px; 
+            min-height: 400px;
+        }
+        
+        .hidden-file-input {
+            width: 0.1px;
+            height: 0.1px;
+            opacity: 0;
+            overflow: hidden;
+            position: absolute;
+            z-index: -1;
+        }
+    </style>
+</head>
+
+<body class="font-sans text-gray-800 bg-gray-50 antialiased">
+
+    <!-- Navbar - Fondo oscuro para el estilo del logo -->
+    <header class="sticky top-0 z-50 bg-dark-bg shadow-md">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <!-- LOGO ACTUALIZADO A "Atelier Print" -->
+            <a href="#" class="text-3xl font-extrabold tracking-tight flex items-center">
+                <span class="text-white">Atelier</span>
+                <span class="text-primary ml-2">Print</span>
+            </a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#inicio" class="text-gray-200 hover:text-primary transition duration-300 font-medium">Inicio</a>
+                <a href="#servicios" class="text-gray-200 hover:text-primary transition duration-300 font-medium">Servicios</a>
+                <a href="#" onclick="openCustomizer(event)" class="text-gray-200 hover:text-primary transition duration-300 font-medium">Diseña Ahora</a>
+                <a href="#galeria" class="text-gray-200 hover:text-primary transition duration-300 font-medium">Galería</a>
+                <a href="#contacto" class="text-dark-bg bg-secondary py-2 px-4 rounded-full hover:bg-yellow-300 transition duration-300 font-medium shadow-lg">Contacto</a>
+            </div>
+            <button class="md:hidden p-2 text-primary hover:text-sky-600 transition duration-300 rounded-lg font-bold">
+                Menú
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Sección Hero (Inicio) y otras secciones... (omitted for brevity) -->
+        <section id="inicio" class="relative bg-dark-bg text-white pt-20 pb-28 md:pt-32 md:pb-40 overflow-hidden">
+            <div class="absolute inset-0 opacity-10 bg-repeat" style="background-image: linear-gradient(45deg, rgba(79, 195, 247, 0.1) 25%, transparent 25%, transparent 75%, rgba(79, 195, 247, 0.1) 75%, rgba(79, 195, 247, 0.1)); background-size: 50px 50px;"></div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 text-center md:text-left mb-10 md:mb-0">
+                    <h1 class="text-5xl md:text-6xl font-extrabold leading-tight mb-4 tracking-tighter">
+                        Tu Idea, <span class="text-secondary block md:inline">Nuestra Estampa.</span>
+                    </h1>
+                    <p class="text-xl text-gray-300 mb-8 max-w-lg mx-auto md:mx-0">
+                        Convertimos tus diseños en productos memorables. Expertos en sublimación de alta definición y estampados duraderos.
+                    </p>
+                    <a href="#" onclick="openCustomizer(event)" class="inline-block bg-secondary text-dark-bg font-bold py-3 px-8 rounded-full text-lg hover:bg-yellow-300 transition duration-300 transform hover:scale-105 shadow-xl">
+                        Empieza a Diseñar
+                    </a>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <div class="w-64 h-64 md:w-96 md:h-96 rounded-3xl shadow-2xl transform rotate-3 hover:rotate-0 transition duration-500 ease-in-out border-4 border-secondary/50 max-w-full flex items-center justify-center bg-primary text-dark-bg text-2xl font-bold">
+                        Tu Diseño Aquí
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Servicios -->
+        <section id="servicios" class="py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Nuestros Servicios Clave</h2>
+                <p class="text-xl text-gray-600 mb-12">Calidad, color y precisión en cada técnica que dominamos.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    <div class="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition duration-500 transform hover:-translate-y-1 border-t-4 border-primary/50">
+                        <h3 class="text-2xl font-semibold mb-3 pt-4">Sublimación de Alta Definición</h3>
+                        <p class="text-gray-600">Ideal para textiles de poliéster y productos promocionales. Colores vibrantes, permanentes y que no se sienten al tacto. Perfecto para diseños complejos.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition duration-500 transform hover:-translate-y-1 border-t-4 border-primary/50">
+                        <h3 class="text-2xl font-semibold mb-3 pt-4">Estampado con Vinilo Termotransferible</h3>
+                        <p class="text-gray-600">Acabados con textura, efectos especiales (glitter, metálicos) y gran opacidad. Excelente para algodón y prendas de trabajo o deportivas de alta resistencia.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition duration-500 transform hover:-translate-y-1 border-t-4 border-primary/50">
+                        <h3 class="text-2xl font-semibold mb-3 pt-4">Asesoría y Diseño Gráfico</h3>
+                        <p class="text-gray-600">¿No tienes el diseño listo? Nuestro equipo te asesora o crea el arte final desde cero, garantizando que el resultado impreso sea perfecto y listo para producción.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Galería/Portfolio -->
+        <section id="galeria" class="py-20 bg-gray-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Proyectos que Nos Inspiran</h2>
+                <p class="text-xl text-gray-600 mb-12">Mira la calidad y el detalle que ponemos en cada pedido.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="relative group overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition duration-300 bg-primary h-64 flex items-center justify-center">
+                        <div class="absolute inset-0 bg-primary/70 opacity-100 flex items-center justify-center">
+                            <p class="text-white text-xl font-bold">Tazas Premium</p>
+                        </div>
+                    </div>
+                    <div class="relative group overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition duration-300 bg-secondary h-64 flex items-center justify-center">
+                        <div class="absolute inset-0 bg-secondary/70 opacity-100 flex items-center justify-center">
+                            <p class="text-dark-bg text-xl font-bold">Remeras Full Color</p>
+                        </div>
+                    </div>
+                    <div class="relative group overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition duration-300 bg-blue-500 h-64 flex items-center justify-center">
+                        <div class="absolute inset-0 bg-blue-500/70 opacity-100 flex items-center justify-center">
+                            <p class="text-white text-xl font-bold">Gorras de Marca</p>
+                        </div>
+                    </div>
+                    <div class="relative group overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition duration-300 bg-emerald-500 h-64 flex items-center justify-center">
+                        <div class="absolute inset-0 bg-emerald-500/70 opacity-100 flex items-center justify-center">
+                            <p class="text-white text-xl font-bold">Merchandising</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="#contacto" onclick="closeCustomizer()" class="mt-12 inline-block text-lg font-semibold text-primary hover:text-sky-600 transition duration-300 border-b-2 border-primary hover:border-sky-600">Ver más trabajos →</a>
+            </div>
+        </section>
+
+        <!-- Sección de Ubicación y Contacto... (sin cambios) -->
+        <section id="ubicacion" class="py-20 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Encuéntranos en Tarragona</h2>
+                <p class="text-xl text-gray-600 mb-8">Estamos cerca de la histórica Tarraco Arena (Antigua Plaza de Toros).</p>
+                <div class="rounded-2xl overflow-hidden shadow-2xl border-4 border-primary w-full max-w-4xl mx-auto" style="height: 400px;">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3005.150495333583!2d1.2383670763268882!3d41.11986421455361!2m3!1f0!2f0!0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12a02d44955b271d%3A0xc682243d7c57b988!2sTarraco%20Arena!5e0!0m2!1ses!5m2" 
+                        width="100%" 
+                        height="100%" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade"
+                        title="Ubicación de SYMF Print en Tarragona (Tarraco Arena)">
+                    </iframe>
+                </div>
+            </div>
+        </section>
+
+        <section id="contacto" class="py-20 bg-dark-bg text-white">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-bold text-white mb-4">¡Empecemos tu Proyecto!</h2>
+                    <p class="text-xl text-gray-300">Cuéntanos tu idea. Te responderemos con una cotización detallada en menos de 24 horas.</p>
+                    <a href="https://wa.me/5491100000000?text=Hola,%20me%20interesa%20una%20cotización%20de%20sublimación." target="_blank" class="inline-flex items-center justify-center mt-6 mb-10 bg-green-500 text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-green-600 transition duration-300 transform hover:scale-105 shadow-xl">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square-text mr-3"><path d="M21 15v4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14l4-4h12a2 2 0 0 0 2 2z"/><line x1="8" x2="16" y1="9" y2="9"/><line x1="8" x2="14" y1="13" y2="13"/></svg>
+                        Contactar Directo por WhatsApp
+                    </a>
+                </div>
+
+                <div class="bg-white p-8 md:p-10 rounded-2xl shadow-2xl">
+                    <form id="contactForm" class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
+                            <input type="text" id="name" name="name" required class="input-focus mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 transition duration-150">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+                            <input type="email" id="email" name="email" required class="input-focus mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 transition duration-150">
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Detalles del Proyecto (Cantidad, Tipo de Producto, Diseño)</label>
+                            <textarea id="message" name="message" rows="4" required class="input-focus mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 transition duration-150"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-sky-600 transition duration-300 transform hover:scale-[1.01] shadow-lg">
+                            Enviar Solicitud de Cotización
+                        </button>
+                    </form>
+                    <div id="statusMessage" class="mt-4 hidden p-4 rounded-lg text-center font-semibold text-sm"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL DEL PERSONALIZADOR (Fuera de <main> y oculto) -->
+    <div id="customizerModal" class="fixed inset-0 z-[100] bg-dark-bg/95 backdrop-blur-sm hidden overflow-y-auto transition-opacity duration-300 opacity-0">
+        <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+            <div class="bg-gray-50 p-6 md:p-8 rounded-3xl shadow-2xl relative">
+                
+                <!-- Botón de Cierre -->
+                <button onclick="closeCustomizer()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition duration-300 p-2 rounded-full bg-white shadow-lg z-20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-circle"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                </button>
+
+                <div class="text-center">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Diseña tu Producto al Instante</h2>
+                    <p class="text-lg md:text-xl text-gray-600 mb-8">Arrastra, pellizca o usa la rueda para ajustar tu diseño.</p>
+                </div>
+
+                <!-- Contenedor Responsive: Vista Previa arriba en móvil, Controles abajo -->
+                <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start max-w-5xl mx-auto">
+                    
+                    <!-- Columna de Vista Previa (3/5 en desktop, 1/1 en mobile - orden 1) -->
+                    <div class="lg:w-3/5 w-full order-1 lg:order-2 bg-white p-4 md:p-6 rounded-2xl shadow-xl flex justify-center items-center">
+                        <div id="previewBox" class="relative w-full mx-auto max-w-sm transition-all duration-300 bg-gray-100 rounded-xl p-4 shadow-inner">
+                            <div id="productBaseContainer" class="product-base aspect-ratio-portrait bg-white">
+                                <!-- IMAGEN BASE (MOCKUP) CON RUTA RELATIVA: './images/camiseta_blanca.jpg' -->
+                                <img id="baseProductImage" 
+                                    src="./images/camiseta_blanca.jpg" 
+                                    alt="Camiseta Blanca Personalizada" 
+                                    class="product-base-inner w-full h-full object-cover transition-opacity duration-300"
+                                >
+                                
+                                <!-- Placeholder de Color (Solo visible si no hay imagen de mockup) -->
+                                <div id="baseColorPlaceholder" class="product-base-inner hidden bg-gray-50">
+                                    <div class="product-base-inner">
+                                        <!-- Icono Lucide para un mockup genérico -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" id="productMockupIcon" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shirt mb-2 text-gray-400"><path d="M20.3 3.3a2 2 0 0 0-2.6.4l-4.2 3.8L9 3.7c-.5-.4-1-.7-1.7-.7s-1.2.3-1.7.7L2.3 8.2a2 2 0 0 0-.4 2.6l4.2 3.8V21a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6.4l4.2-3.8a2 2 0 0 0-.4-2.6z"/></svg>
+                                        <p class="text-xl font-bold"></p>
+                                        <p class="text-sm">(Mockup Color)</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Capa de Diseño (Overlay) -->
+                                <img id="designOverlay" src="" alt="Tu Diseño de Sublimación" 
+                                    class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-100 ease-linear opacity-0 z-10" 
+                                    style="width: 150px; height: auto; user-select: none;"
+                                >
+                                
+                                <!-- Mensaje para subir diseño -->
+                                <div id="designPrompt" class="absolute inset-0 flex items-center justify-center text-gray-400 font-semibold bg-white/70 rounded-xl transition duration-300">
+                                    Sube un diseño para verlo aquí
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna de Controles (2/5 en desktop, 1/1 en mobile - orden 2) -->
+                    <div class="lg:w-2/5 w-full order-2 lg:order-1 bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-200 text-left">
+                        
+                        <!-- 1. Producto y Color -->
+                        <h3 class="text-2xl font-semibold mb-4 text-gray-900">1. Producto y Color</h3>
+                        
+                        <!-- Selector de Producto -->
+                        <label class="block text-gray-700 font-medium mb-2">Selecciona el Producto</label>
+                        <div class="flex space-x-4 mb-6">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="productType" value="shirt" checked onchange="updateProductView()" class="form-radio text-primary h-5 w-5 border-gray-300 focus:ring-primary rounded-full">
+                                <span class="ml-2 text-gray-700 font-medium">Camiseta</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="productType" value="mug" onchange="updateProductView()" class="form-radio text-primary h-5 w-5 border-gray-300 focus:ring-primary rounded-full">
+                                <span class="ml-2 text-gray-700 font-medium">Taza</span>
+                            </label>
+                        </div>
+
+                        <!-- Selector de Color -->
+                        <label class="block text-gray-700 font-medium mb-2">Selecciona el Color</label>
+                        <div class="flex space-x-4 mb-6">
+                            <label class="inline-flex items-center">
+                                <input type="radio" id="colorWhite" name="productColor" value="white" checked onchange="updateProductView()" class="form-radio text-primary h-5 w-5 border-gray-300 focus:ring-primary rounded-full">
+                                <span class="ml-2 text-gray-700 font-medium">Blanco</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" id="colorBlack" name="productColor" value="black" onchange="updateProductView()" class="form-radio text-primary h-5 w-5 border-gray-300 focus:ring-primary rounded-full">
+                                <span class="ml-2 text-gray-700 font-medium">Negro</span>
+                            </label>
+                        </div>
+
+                        <!-- 2. Sube tu Diseño -->
+                        <h3 class="text-2xl font-semibold mt-8 mb-4 text-gray-900">2. Sube y Ajusta</h3>
+                        
+                        <input type="file" id="designUpload" accept="image/*" class="hidden-file-input">
+                        
+                        <label for="designUpload" class="w-full inline-flex items-center justify-center bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-sky-600 transition duration-300 shadow-md cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload mr-2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                            Seleccionar Archivo de Imagen
+                        </label>
+
+                        <p id="uploadStatus" class="mt-4 text-sm text-gray-500 hidden"></p>
+
+                        <!-- Mensaje de instrucción de interacción táctil -->
+                        <div id="interactionGuide" class="mt-4 p-3 bg-primary/10 border border-primary/30 rounded-lg text-sm text-gray-700 font-medium hidden">
+                            <p class="font-bold text-primary mb-1">¡Consejo de Diseño!</p>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>**Móvil:** Arrastra con un dedo para mover. Pellizca con dos dedos para cambiar tamaño.</li>
+                                <li>**Desktop:** Arrastra con el ratón. Usa la rueda para cambiar tamaño.</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- 4. Talle (Condicional) -->
+                        <div id="shirtSizeSelector" class="transition-all duration-300 ease-in-out overflow-hidden mt-8 max-h-[500px]">
+                            <h3 class="text-2xl font-semibold mb-4 text-gray-900">3. Selecciona Talle</h3>
+                            <div class="space-y-4">
+                                <label for="shirtSize" class="block text-gray-700 font-medium mb-1">Talle de Camiseta</label>
+                                <select id="shirtSize" class="w-full border border-gray-300 rounded-lg p-3 text-gray-700 bg-gray-50 input-focus transition duration-150">
+                                    <option value="S">S - Small</option>
+                                    <option value="M" selected>M - Medium</option>
+                                    <option value="L">L - Large</option>
+                                    <option value="XL">XL - Extra Large</option>
+                                </select>
+                                
+                                <button onclick="toggleSizeGuide()" class="text-sm font-medium text-primary hover:text-sky-600 transition duration-300 flex items-center mt-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ruler mr-1"><path d="M20 7H4"/><path d="M10 3v4"/><path d="M14 3v4"/><path d="M16 11H8"/><path d="M12 7v14"/></svg>
+                                    <span id="guideToggleButton">Ver Guía de Talles (Abrir)</span>
+                                </button>
+                            </div>
+                            
+                            <div id="sizeGuideTable" class="mt-6 p-0 border border-gray-300 rounded-lg bg-gray-50 max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                                <div class="p-4">
+                                    <h4 class="text-lg font-bold mb-3 text-gray-800">Guía de Talles (Medidas en cm)</h4>
+                                    <table class="w-full text-sm text-gray-700 text-left">
+                                        <thead class="border-b border-gray-200">
+                                            <tr>
+                                                <th class="py-1 pr-2">Talle</th>
+                                                <th class="py-1 px-2">Ancho (Pecho)</th>
+                                                <th class="py-1 pl-2">Largo (Espalda)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="border-b border-gray-100">
+                                                <td class="py-1 pr-2 font-semibold">S</td>
+                                                <td class="py-1 px-2">48 cm</td>
+                                                <td class="py-1 pl-2">68 cm</td>
+                                            </tr>
+                                            <tr class="border-b border-gray-100">
+                                                <td class="py-1 px-2 font-semibold">M</td>
+                                                <td class="py-1 pl-2">51 cm</td>
+                                                <td class="py-1 pl-2">71 cm</td>
+                                            </tr>
+                                            <tr class="border-b border-gray-100">
+                                                <td class="py-1 pr-2 font-semibold">L</td>
+                                                <td class="py-1 px-2">54 cm</td>
+                                                <td class="py-1 pl-2">74 cm</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="py-1 pr-2 font-semibold">XL</td>
+                                                <td class="py-1 px-2">57 cm</td>
+                                                <td class="py-1 pl-2">77 cm</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p class="text-xs mt-3 text-gray-500">Nota: El ancho se mide de axila a axila. Tolerancia de $\pm 2$ cm.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="resetDesign()" class="mt-8 w-full bg-red-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-red-600 transition duration-300 shadow-md">
+                            Reiniciar Diseño
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Call to action después del diseño -->
+                <div class="mt-12 text-center">
+                    <a href="#contacto" onclick="closeCustomizer()" class="inline-block bg-primary text-white font-bold py-3 px-10 rounded-full text-lg hover:bg-sky-600 transition duration-300 transform hover:scale-105 shadow-xl">
+                        ¡Me gusta! Quiero Cotizar este Diseño
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- JavaScript para el Formulario y el Personalizador -->
+    <script>
+        // --- LÓGICA DEL PERSONALIZADOR ---
+        const designUpload = document.getElementById('designUpload');
+        const designOverlay = document.getElementById('designOverlay');
+        const designPrompt = document.getElementById('designPrompt');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const interactionGuide = document.getElementById('interactionGuide');
+        
+        const sizeGuideTable = document.getElementById('sizeGuideTable');
+        const guideToggleButton = document.getElementById('guideToggleButton');
+        const shirtSizeSelector = document.getElementById('shirtSizeSelector');
+        
+        const baseProductImage = document.getElementById('baseProductImage');
+        const baseColorPlaceholder = document.getElementById('baseColorPlaceholder');
+        const productBaseContainer = document.getElementById('productBaseContainer');
+        const previewBox = document.getElementById('previewBox');
+
+
+        // Definición de Mockups de Producto con rutas relativas para un servidor estándar.
+        const PRODUCT_MOCKUPS = {
+            // Usa una ruta relativa: El archivo debe estar en /images/camiseta_blanca.jpg
+            'shirt-white': { 
+                url: './images/camiseta_blanca.jpg', 
+                type: 'shirt', 
+                name: 'Camiseta Blanca' 
+            },
+            // Si no hay mockup físico, usamos un color plano (background-color)
+            'shirt-black': { 
+                url: '', 
+                type: 'shirt', 
+                name: 'Camiseta Negra' 
+            }, 
+            'mug-white': { 
+                url: '', 
+                type: 'mug', 
+                name: 'Taza Blanca' 
+            }, 
+            'mug-black': { 
+                url: '', 
+                type: 'mug', 
+                name: 'Taza Negra' 
+            }
+        };
+
+        // Estado inicial de la superposición del diseño (AHORA DINÁMICO)
+        let designState = {
+            x: 0, // Posición central inicial (relative to the center of productBaseContainer)
+            y: 0, 
+            scale: 1, // 1 = 150px de ancho base
+            designUrl: '',
+            isDragging: false,
+            initialTouchDistance: null, // Para gestos de pinza (pinch)
+            lastX: 0,
+            lastY: 0,
+        };
+        
+        // Área de impresión segura (SAFE_ZONE): define el porcentaje del borde que es un margen.
+        // Ejemplo: 0.1 significa que el área imprimible es del 80% (1 - 0.1*2) del ancho/alto del contenedor.
+        const SAFE_ZONE = 0.1; 
+
+        // Función para aplicar la transformación al overlay
+        function applyDesignTransform() {
+            // 1. Calcular el ancho base (e.g., 150px) y aplicarle la escala
+            const baseDesignWidth = 150; 
+            const newWidth = baseDesignWidth * designState.scale;
+            designOverlay.style.width = `${newWidth}px`;
+            designOverlay.style.height = `auto`; // Mantener relación de aspecto
+
+            // 2. Aplicar la traslación (posición)
+            // El overlay se centra inicialmente con -translate-x-1/2 -translate-y-1/2
+            // designState.x/y es el desplazamiento adicional.
+            designOverlay.style.transform = `translate(-50%, -50%) translate(${designState.x}px, ${designState.y}px)`;
+        }
+        
+        // Función para limitar el movimiento del diseño dentro del área segura
+        function clampDesignPosition() {
+            if (!designState.designUrl) return;
+
+            // Obtener dimensiones del contenedor del producto (donde está el mockup)
+            const containerRect = productBaseContainer.getBoundingClientRect();
+            const containerWidth = containerRect.width;
+            const containerHeight = containerRect.height;
+            
+            // Obtener dimensiones del diseño
+            const designWidth = designOverlay.offsetWidth;
+            const designHeight = designOverlay.offsetHeight;
+
+            // Calcular el margen de seguridad en píxeles
+            const safeXMargin = containerWidth * SAFE_ZONE;
+            const safeYMargin = containerHeight * SAFE_ZONE;
+            
+            // Centro del contenedor
+            const centerX = containerWidth / 2;
+            const centerY = containerHeight / 2;
+
+            // Límites para el centro del diseño (designState.x/y se miden desde el centro)
+            
+            // Límite X
+            // El borde izquierdo del diseño (que está en designState.x - designWidth/2) no debe ser menor que safeXMargin
+            // (designState.x - designWidth/2) > -centerX + safeXMargin
+            // designState.x > -centerX + safeXMargin + designWidth/2
+            const maxX = (centerX - safeXMargin) - (designWidth / 2);
+            const minX = -maxX;
+            
+            // Límite Y
+            const maxY = (centerY - safeYMargin) - (designHeight / 2);
+            const minY = -maxY;
+
+            // Aplicar clamping
+            designState.x = Math.min(Math.max(designState.x, minX), maxX);
+            designState.y = Math.min(Math.max(designState.y, minY), maxY);
+
+            // Si el diseño es más grande que el área segura, forzar el centro
+            if (designWidth > containerWidth * (1 - 2 * SAFE_ZONE)) {
+                designState.x = 0;
+            }
+            if (designHeight > containerHeight * (1 - 2 * SAFE_ZONE)) {
+                designState.y = 0;
+            }
+
+            // Clamping for scale (Zoom out minimum)
+            // Aseguramos que el diseño no se haga demasiado pequeño
+            designState.scale = Math.max(designState.scale, 0.5); // Mínimo 50%
+            
+            applyDesignTransform();
+        }
+
+        // --- LÓGICA DE INTERACCIÓN (Arrastrar y Escalar) ---
+
+        // Función para calcular la distancia entre dos toques (para el zoom de pinza)
+        function getDistance(touches) {
+            return Math.sqrt(
+                Math.pow(touches[0].pageX - touches[1].pageX, 2) +
+                Math.pow(touches[0].pageY - touches[1].pageY, 2)
+            );
+        }
+
+        // 1. INICIO DE ARRASTRE/ZOOM (Mouse Down / Touch Start)
+        designOverlay.addEventListener('mousedown', startDrag);
+        designOverlay.addEventListener('touchstart', startDrag, { passive: false });
+
+        function startDrag(e) {
+            e.preventDefault();
+            if (!designState.designUrl) return;
+
+            designState.isDragging = true;
+            
+            if (e.touches && e.touches.length > 0) {
+                // Táctil (Touch)
+                if (e.touches.length === 1) {
+                    // Arrastre con un dedo
+                    designState.lastX = e.touches[0].clientX;
+                    designState.lastY = e.touches[0].clientY;
+                    designState.initialTouchDistance = null; // Reiniciar distancia de pinza
+                } else if (e.touches.length >= 2) {
+                    // Zoom con dos dedos (Pinza)
+                    designState.initialTouchDistance = getDistance(e.touches);
+                    designState.lastScale = designState.scale;
+                    designState.isDragging = false; // Desactivar arrastre mientras se hace pinza
+                }
+            } else {
+                // Ratón (Mouse)
+                designState.lastX = e.clientX;
+                designState.lastY = e.clientY;
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('mouseup', endDrag);
+            }
+        }
+        
+        // 2. ARRASTRE/ZOOM EN CURSO (Mouse Move / Touch Move)
+        designOverlay.addEventListener('touchmove', drag, { passive: false });
+
+        function drag(e) {
+            if (!designState.designUrl) return;
+            e.preventDefault(); // Prevenir el scroll del navegador
+
+            if (e.touches && e.touches.length > 0) {
+                // Táctil (Touch)
+                if (e.touches.length === 1 && designState.isDragging) {
+                    // Mover (Arrastrar)
+                    const deltaX = e.touches[0].clientX - designState.lastX;
+                    const deltaY = e.touches[0].clientY - designState.lastY;
+
+                    designState.x += deltaX;
+                    designState.y += deltaY;
+
+                    designState.lastX = e.touches[0].clientX;
+                    designState.lastY = e.touches[0].clientY;
+                } else if (e.touches.length >= 2 && designState.initialTouchDistance !== null) {
+                    // Zoom (Pinza)
+                    const currentDistance = getDistance(e.touches);
+                    const scaleFactor = currentDistance / designState.initialTouchDistance;
+                    designState.scale = designState.lastScale * scaleFactor;
+                }
+            } else if (designState.isDragging) {
+                // Ratón (Mouse)
+                const deltaX = e.clientX - designState.lastX;
+                const deltaY = e.clientY - designState.lastY;
+
+                designState.x += deltaX;
+                designState.y += deltaY;
+
+                designState.lastX = e.clientX;
+                designState.lastY = e.clientY;
+            }
+            
+            clampDesignPosition();
+        }
+
+        // 3. FINALIZAR ARRASTRE/ZOOM (Mouse Up / Touch End)
+        designOverlay.addEventListener('touchend', endDrag);
+
+        function endDrag(e) {
+            designState.isDragging = false;
+            designState.initialTouchDistance = null;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', endDrag);
+            // Re-evaluar límites al soltar
+            clampDesignPosition();
+        }
+
+        // 4. ZOOM CON RUEDA (Desktop only)
+        designOverlay.addEventListener('wheel', function(e) {
+            if (!designState.designUrl) return;
+            e.preventDefault(); 
+
+            // Determinar la dirección del zoom
+            const zoomAmount = e.deltaY > 0 ? -0.1 : 0.1; 
+            
+            // Aplicar el nuevo factor de escala
+            designState.scale += zoomAmount;
+            
+            // Re-evaluar límites después del zoom
+            clampDesignPosition(); 
+        });
+
+        // --- FUNCIONES DEL MODAL Y VISTA ---
+
+        // Función para abrir el modal
+        function openCustomizer(event) {
+            if (event) event.preventDefault();
+            const modal = document.getElementById('customizerModal');
+            modal.classList.remove('hidden');
+            // Forzar reflow para la transición de opacidad
+            setTimeout(() => modal.classList.add('opacity-100'), 10);
+            updateProductView(); // Asegura que la vista inicial sea correcta
+        }
+
+        // Función para cerrar el modal
+        function closeCustomizer() {
+            const modal = document.getElementById('customizerModal');
+            modal.classList.remove('opacity-100');
+            // Ocultar después de la transición
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        // Función principal para actualizar la vista del producto y el diseño
+        function updateProductView() {
+            const productType = document.querySelector('input[name="productType"]:checked').value;
+            const productColor = document.querySelector('input[name="productColor"]:checked').value;
+            const key = `${productType}-${productColor}`;
+            const product = PRODUCT_MOCKUPS[key];
+            const isShirt = productType === 'shirt';
+
+            // 1. Alternar Controles Específicos
+            // Muestra u oculta el selector de talle (solo para camisetas)
+            shirtSizeSelector.style.maxHeight = isShirt ? '500px' : '0';
+            shirtSizeSelector.style.paddingTop = isShirt ? '2rem' : '0';
+            shirtSizeSelector.style.borderTop = isShirt ? '1px solid #e5e7eb' : 'none';
+
+            // 2. Actualizar Mockup de Producto Base
+            productBaseContainer.classList.toggle('aspect-ratio-portrait', isShirt);
+            productBaseContainer.classList.toggle('aspect-ratio-square', !isShirt);
+
+            // Si hay una URL de imagen base (ej: ./images/camiseta_blanca.jpg)
+            if (product.url) {
+                baseProductImage.src = product.url;
+                baseProductImage.classList.remove('hidden');
+                baseColorPlaceholder.classList.add('hidden');
+                productBaseContainer.style.backgroundColor = 'transparent'; 
+            } else {
+                // Si no hay URL, usamos el placeholder de color
+                baseProductImage.classList.add('hidden');
+                baseColorPlaceholder.classList.remove('hidden');
+                
+                // Aplicar el color base al contenedor del producto
+                if (productColor === 'white') {
+                    productBaseContainer.style.backgroundColor = '#f9fafb'; 
+                    document.getElementById('productMockupIcon').classList.remove('text-gray-200');
+                    document.getElementById('productMockupIcon').classList.add('text-gray-400');
+                    baseColorPlaceholder.querySelector('p:first-child').classList.remove('text-gray-200');
+                    baseColorPlaceholder.querySelector('p:first-child').classList.add('text-gray-800');
+
+                } else if (productColor === 'black') {
+                    productBaseContainer.style.backgroundColor = '#4b5563'; 
+                    document.getElementById('productMockupIcon').classList.remove('text-gray-400');
+                    document.getElementById('productMockupIcon').classList.add('text-gray-200');
+                    baseColorPlaceholder.querySelector('p:first-child').classList.remove('text-gray-800');
+                    baseColorPlaceholder.querySelector('p:first-child').classList.add('text-gray-200');
+                }
+
+                // Actualizar el nombre del mockup de color
+                baseColorPlaceholder.querySelector('p:first-child').textContent = product.name;
+
+                // Actualizar icono Lucide para que coincida con el producto (Taza o Camiseta)
+                const iconPath = isShirt ? 'M20.3 3.3a2 2 0 0 0-2.6.4l-4.2 3.8L9 3.7c-.5-.4-1-.7-1.7-.7s-1.2.3-1.7.7L2.3 8.2a2 2 0 0 0-.4 2.6l4.2 3.8V21a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6.4l4.2-3.8a2 2 0 0 0-.4-2.6z' : 'M17 6H3v8h14V6zm-1-4h-4v4h4V2zM21 9v2h-2v2h2v2h-2v2h2v2h2v-8h-2V9z';
+                const iconClass = isShirt ? 'lucide lucide-shirt' : 'lucide lucide-coffee';
+                const svg = document.getElementById('productMockupIcon');
+                svg.innerHTML = isShirt ? '<path d="M20.3 3.3a2 2 0 0 0-2.6.4l-4.2 3.8L9 3.7c-.5-.4-1-.7-1.7-.7s-1.2.3-1.7.7L2.3 8.2a2 2 0 0 0-.4 2.6l4.2 3.8V21a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6.4l4.2-3.8a2 2 0 0 0-.4-2.6z"/>' : '<path d="M10 2v2"/><path d="M14 2v2"/><path d="M8 21h8"/><path d="M8 21a2 2 0 0 1-2-2v-3H4a2 2 0 0 1-2-2V7h20v7a2 2 0 0 1-2 2h-2v3a2 2 0 0 1-2 2z"/><path d="M16 16v-3a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v3"/>';
+                svg.className.baseVal = iconClass + ' mb-2 text-gray-400';
+            }
+
+            // 3. Ajustar Overlay de Diseño (posición)
+            clampDesignPosition();
+        }
+
+        // Función para manejar la subida de la imagen del diseño
+        designUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    // Inicializar el diseño al centro con escala 1 al cargar
+                    designState.designUrl = event.target.result;
+                    designState.x = 0; 
+                    designState.y = 0; 
+                    designState.scale = 1; 
+
+                    designOverlay.src = designState.designUrl;
+                    designOverlay.classList.remove('opacity-0');
+                    designPrompt.classList.add('hidden');
+                    interactionGuide.classList.remove('hidden');
+
+                    clampDesignPosition(); // Aplicar posición inicial y límites
+                    uploadStatus.textContent = `Archivo: ${file.name} cargado.`;
+                    uploadStatus.classList.remove('hidden', 'text-red-500', 'text-gray-500');
+                    uploadStatus.classList.add('text-primary');
+                };
+                reader.onerror = function() {
+                    uploadStatus.textContent = "Error al cargar el archivo.";
+                    uploadStatus.classList.remove('hidden', 'text-primary', 'text-gray-500');
+                    uploadStatus.classList.add('text-red-500');
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Función para reiniciar el personalizador
+        function resetDesign() {
+            // Reiniciar estado
+            designState = {
+                x: 0,
+                y: 0,
+                scale: 1,
+                designUrl: '',
+                isDragging: false,
+                initialTouchDistance: null, 
+                lastX: 0,
+                lastY: 0,
+            };
+
+            // Reiniciar DOM
+            designOverlay.src = '';
+            designOverlay.classList.add('opacity-0');
+            designPrompt.classList.remove('hidden');
+            interactionGuide.classList.add('hidden');
+            
+            // Revertir a la vista predeterminada (Camiseta Blanca)
+            document.getElementById('colorWhite').checked = true;
+            document.querySelector('input[name="productType"][value="shirt"]').checked = true;
+            
+            updateProductView();
+            applyDesignTransform();
+            
+            uploadStatus.textContent = "Vista previa reiniciada.";
+            uploadStatus.classList.remove('hidden', 'text-primary', 'text-red-500');
+            uploadStatus.classList.add('text-gray-500');
+        }
+
+        // Función para mostrar/ocultar la guía de talles
+        function toggleSizeGuide() {
+            const isHidden = sizeGuideTable.style.maxHeight === '0px' || sizeGuideTable.style.maxHeight === '';
+            if (isHidden) {
+                // Abrir
+                sizeGuideTable.style.maxHeight = sizeGuideTable.scrollHeight + "px";
+                guideToggleButton.textContent = "Ver Guía de Talles (Cerrar)";
+                sizeGuideTable.style.padding = '1rem';
+            } else {
+                // Cerrar
+                sizeGuideTable.style.maxHeight = '0px';
+                guideToggleButton.textContent = "Ver Guía de Talles (Abrir)";
+                sizeGuideTable.style.padding = '0';
+            }
+        }
+
+        // Inicializar la vista al cargar
+        window.onload = function() {
+            updateProductView();
+        }
+
+        // Lógica para reajustar límites al cambiar el tamaño de la ventana
+        window.addEventListener('resize', clampDesignPosition);
+
+        // --- LÓGICA DEL FORMULARIO DE CONTACTO (simulación de envío) ---
+        const contactForm = document.getElementById('contactForm');
+        const statusMessage = document.getElementById('statusMessage');
+
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Simular envío de datos
+            const formData = new FormData(contactForm);
+            const data = Object.fromEntries(formData.entries());
+
+            // Mostrar mensaje de éxito simulado
+            statusMessage.textContent = "¡Gracias! Tu solicitud ha sido enviada con éxito. Te contactaremos pronto.";
+            statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-700');
+            statusMessage.classList.add('bg-green-100', 'text-green-700');
+            
+            // Opcional: limpiar formulario después de un tiempo
+            setTimeout(() => {
+                contactForm.reset();
+                statusMessage.classList.add('hidden');
+                statusMessage.classList.remove('bg-green-100', 'text-green-700');
+            }, 5000);
+        });
+
+    </script>
+</body>
+</html>
